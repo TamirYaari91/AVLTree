@@ -217,28 +217,28 @@ public class AVLTree {
         }
 
         public IAVLNode getRight() {
-            return null; // to be replaced by student code
+            return this.right;
         }
 
         public void setParent(IAVLNode node) {
-            return null; // to be replaced by student code
+            this.parent = (AVLNode) node;
         }
 
         public IAVLNode getParent() {
-            return null; // to be replaced by student code
+            return this.parent;
         }
 
         // Returns True if this is a non-virtual AVL node
         public boolean isRealNode() {
-            return true; // to be replaced by student code
+            return this.key != -1;
         }
 
         public void setHeight(int height) {
-            return null; // to be replaced by student code
+            this.height = height;
         }
 
         public int getHeight() {
-            return 42; // to be replaced by student code
+            return this.height;
         }
     }
 
