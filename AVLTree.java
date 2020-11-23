@@ -7,6 +7,11 @@
 
 public class AVLTree {
 
+    AVLNode root;
+
+    public AVLTree() {
+    }
+
     /**
      * public boolean empty()
      * <p>
@@ -23,7 +28,23 @@ public class AVLTree {
      * otherwise, returns null
      */
     public String search(int k) {
-        return "42";  // to be replaced by student code
+        AVLNode node = root;
+        return search(node,k);
+    }
+
+    private String search(AVLNode node, int k) {
+        if (node == null) {
+            return null;
+        }
+        if (node.key == k) {
+            return node.info;
+        } else {
+            if (node.key > k) {
+                return search(node.left, k);
+            } else {
+                return search(node.right, k);
+            }
+        }
     }
 
     /**
@@ -189,7 +210,8 @@ public class AVLTree {
         AVLNode parent = null;
         int height = -1;
 
-        public AVLNode(){} //for virtual nodes
+        public AVLNode() {
+        } // for virtual nodes
 
         public AVLNode(int key, String info) { // for regular nodes
             this.key = key;
