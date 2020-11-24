@@ -11,6 +11,7 @@ public class AVLTreeDraft {
 
     public AVLTreeDraft() {
     }
+
     /**
      * public boolean empty()
      * <p>
@@ -27,7 +28,11 @@ public class AVLTreeDraft {
      * otherwise, returns null
      */
     public String search(int k) {
-        return "42";  // to be replaced by student code
+        if (this.empty()) {
+            return null;
+        }
+        IAVLNode root = this.getRoot();
+        return ((AVLNode) root).searchNode(k);
     }
 
     /**
@@ -67,7 +72,7 @@ public class AVLTreeDraft {
             return null;
         }
         IAVLNode root = this.getRoot();
-        IAVLNode minNode = ((AVLNode)root).nodeMin();
+        IAVLNode minNode = ((AVLNode) root).nodeMin();
         return minNode.getValue(); // to be replaced by student code
     }
 
@@ -82,7 +87,7 @@ public class AVLTreeDraft {
             return null;
         }
         IAVLNode root = this.getRoot();
-        IAVLNode maxNode = ((AVLNode)root).nodeMax();
+        IAVLNode maxNode = ((AVLNode) root).nodeMax();
         return maxNode.getValue(); // to be replaced by student code
     }
 
@@ -93,7 +98,17 @@ public class AVLTreeDraft {
      * or an empty array if the tree is empty.
      */
     public int[] keysToArray() {
-        int[] arr = new int[42]; // to be replaced by student code
+        int[] arr = new int[size()]; // to be replaced by student code
+        if (arr.length == 0) {
+            return arr;
+        }
+        IAVLNode root = getRoot();
+        IAVLNode minNode = ((AVLNode) root).nodeMin();
+        arr[0] = minNode.getKey();
+        for (int i = 1; i < arr.length; i++) {
+            minNode = ((AVLNode) minNode).Successor();
+            arr[i] = minNode.getKey();
+        }
         return arr;              // to be replaced by student code
     }
 
@@ -105,9 +120,18 @@ public class AVLTreeDraft {
      * or an empty array if the tree is empty.
      */
     public String[] infoToArray() {
-        String[] arr = new String[42]; // to be replaced by student code
-        return arr;                    // to be replaced by student code
-    }
+        String[] arr = new String[size()]; // to be replaced by student code
+        if (arr.length == 0) {
+            return arr;
+        }
+        IAVLNode root = getRoot();
+        IAVLNode minNode = ((AVLNode) root).nodeMin();
+        arr[0] = minNode.getValue();
+        for (int i = 1; i < arr.length; i++) {
+            minNode = ((AVLNode) minNode).Successor();
+            arr[i] = minNode.getValue();
+        }
+        return arr;         }
 
     /**
      * public int size()
@@ -119,7 +143,7 @@ public class AVLTreeDraft {
      */
     public int size() {
         IAVLNode root = this.getRoot();
-        return ((AVLNode)root).sizeNode(); // to be replaced by student code
+        return ((AVLNode) root).sizeNode(); // to be replaced by student code
     }
 
     /**
@@ -208,7 +232,8 @@ public class AVLTreeDraft {
         AVLNode parent = null;
         int height = -1;
 
-        public AVLNode(){} //for virtual nodes
+        public AVLNode() {
+        } //for virtual nodes
 
         public AVLNode(int key, String info) { // for regular nodes
             this.key = key;
@@ -259,6 +284,7 @@ public class AVLTreeDraft {
         public int getHeight() {
             return this.height;
         }
+
         public AVLNode nodeMin() {
             AVLNode node = this.left;
             while (this.left.isRealNode()) {
@@ -266,6 +292,7 @@ public class AVLTreeDraft {
             }
             return node;
         }
+
         public AVLNode nodeMax() {
             AVLNode node = this.right;
             while (this.right.isRealNode()) {
@@ -273,6 +300,7 @@ public class AVLTreeDraft {
             }
             return node;
         }
+
         public AVLNode Successor() {
             AVLNode node = this.right;
             if (node.isRealNode()) {
@@ -286,6 +314,7 @@ public class AVLTreeDraft {
             }
             return y;
         }
+
         public AVLNode Predecessor() {
             AVLNode node = this.left;
             if (node.isRealNode()) {
@@ -299,12 +328,27 @@ public class AVLTreeDraft {
             }
             return y;
         }
+
         public int sizeNode() {
             if (!this.isRealNode()) {
                 return 0;
-            }
-            else {
+            } else {
                 return 1 + this.left.sizeNode() + this.right.sizeNode();
+            }
+        }
+
+        public String searchNode(int k) {
+            if (!this.isRealNode()) {
+                return null;
+            }
+            if (this.key == k) {
+                return this.info;
+            } else {
+                if (this.key > k) {
+                    return this.left.searchNode(k);
+                } else {
+                    return this.right.searchNode(k);
+                }
             }
         }
     }
