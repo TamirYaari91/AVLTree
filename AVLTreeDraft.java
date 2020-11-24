@@ -7,13 +7,17 @@
 
 public class AVLTreeDraft {
 
+    IAVLNode root = null;
+
+    public AVLTreeDraft() {
+    }
     /**
      * public boolean empty()
      * <p>
      * returns true if and only if the tree is empty
      */
     public boolean empty() {
-        return false; // to be replaced by student code
+        return this.root == null;// to be replaced by student code
     }
 
     /**
@@ -127,7 +131,10 @@ public class AVLTreeDraft {
      * postcondition: none
      */
     public IAVLNode getRoot() {
-        return null;
+        if (this.empty()) {
+            return null;
+        }
+        return this.root;
     }
 
     /**
