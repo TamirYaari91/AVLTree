@@ -62,11 +62,9 @@ public class AVLTreeDraft {
         if (this.empty()) {
             return null;
         }
-        IAVLNode node = this.getRoot();
-        while (node.getLeft() != null) {
-            node = node.getLeft();
-        }
-        return node.getValue(); // to be replaced by student code
+        IAVLNode root = this.getRoot();
+        IAVLNode minNode = ((AVLNode)root).nodeMin();
+        return minNode.getValue(); // to be replaced by student code
     }
 
     /**
@@ -79,11 +77,9 @@ public class AVLTreeDraft {
         if (this.empty()) {
             return null;
         }
-        IAVLNode node = this.getRoot();
-        while (node.getRight() != null) {
-            node = node.getRight();
-        }
-        return node.getValue(); // to be replaced by student code
+        IAVLNode root = this.getRoot();
+        IAVLNode maxNode = ((AVLNode)root).nodeMax();
+        return maxNode.getValue(); // to be replaced by student code
     }
 
     /**
@@ -118,7 +114,8 @@ public class AVLTreeDraft {
      * postcondition: none
      */
     public int size() {
-        return 42; // to be replaced by student code
+        IAVLNode root = this.getRoot();
+        return ((AVLNode)root).sizeNode(); // to be replaced by student code
     }
 
     /**
@@ -255,44 +252,53 @@ public class AVLTreeDraft {
         public int getHeight() {
             return this.height;
         }
-        //        public IAVLNode nodeMin() {
-//            IAVLNode node = this.getLeft();
-//            while (this.getLeft() != null) {
-//                node = node.getLeft();
-//            }
-//            return node;
-//        }
-        public IAVLNode Successor() {
-            AVLNode node = this.right;
-            if (node != null) {
-                while(node.left != null) {
-                    node = node.left;
-                }
-                return node;
+        public AVLNode nodeMin() {
+            AVLNode node = this.left;
+            while (this.left.isRealNode()) {
+                node = node.left;
             }
-            IAVLNode x = this;
-            IAVLNode y = x.getParent();
-            while ((y != null) && (x.getKey() == y.getRight().getKey())) { //we used equal on keys and not nodes!!
+            return node;
+        }
+        public AVLNode nodeMax() {
+            AVLNode node = this.right;
+            while (this.right.isRealNode()) {
+                node = node.right;
+            }
+            return node;
+        }
+        public AVLNode Successor() {
+            AVLNode node = this.right;
+            if (node.isRealNode()) {
+                return node.nodeMin();
+            }
+            AVLNode x = this;
+            AVLNode y = x.parent;
+            while ((y != null) && (x.key == y.right.key)) { //we used equal on keys and not nodes!!
                 x = y;
-                y = x.getParent();
+                y = x.parent;
             }
             return y;
         }
-        public IAVLNode Predecessor() {
-            IAVLNode node = this.getLeft();
-            if (node != null) {
-                while(node.getRight() != null) {
-                    node = node.getRight();
-                }
-                return node;
+        public AVLNode Predecessor() {
+            AVLNode node = this.left;
+            if (node.isRealNode()) {
+                return node.nodeMax();
             }
-            IAVLNode x = this;
-            IAVLNode y = x.getParent();
-            while ((y != null) && (x.getKey() == y.getLeft().getKey())) { //we used equal on keys and not nodes!!
+            AVLNode x = this;
+            AVLNode y = x.parent;
+            while ((y != null) && (x.key == y.key)) { //we used equal on keys and not nodes!!
                 x = y;
-                y = x.getParent();
+                y = x.parent;
             }
             return y;
+        }
+        public int sizeNode() {
+            if (!this.isRealNode()) {
+                return 0;
+            }
+            else {
+                return 1 + this.left.sizeNode() + this.right.sizeNode();
+            }
         }
     }
 
