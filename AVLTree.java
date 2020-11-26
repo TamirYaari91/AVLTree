@@ -11,9 +11,11 @@ import java.util.List;
 public class AVLTree {
 
     public IAVLNode root;
+    public IAVLNode min;
 
     public AVLTree() {
         root = null;
+        min = null;
     }
 
     /**
@@ -52,13 +54,18 @@ public class AVLTree {
         IAVLNode node = new AVLNode(k, i);
         if (root == null) {
             root = node;
+            min = node;
             root.setHeight(0);
             return 42;
+        }
+        if (node.getKey() < min.getKey()) {
+            min = node;
         }
         IAVLNode root = getRoot();
         while (node.getParent() == null) {
             if (node.getKey() < root.getKey()) {
-                if (root.getLeft() == null) {
+//                if (root.getLeft() == null) {
+                if (!root.getLeft().isRealNode()) {
                     root.setLeft(node);
                     node.setParent(root);
                     ((AVLNode) node).setHeightAfterInsert();
@@ -66,7 +73,9 @@ public class AVLTree {
                 }
                 root = root.getLeft();
             } else {
-                if (root.getRight() == null) {
+//                if (root.getRight() == null) {
+                if (!root.getRight().isRealNode()) {
+
                     root.setRight(node);
                     node.setParent(root);
                     ((AVLNode) node).setHeightAfterInsert();
@@ -89,6 +98,30 @@ public class AVLTree {
      * returns -1 if an item with key k was not found in the tree.
      */
     public int delete(int k) {
+        if (search(k) == null) {
+            return -1;
+        }
+        IAVLNode nodeToDelete = ((AVLNode) root).searchNode(k);
+        if (!nodeToDelete.getLeft().isRealNode() && !nodeToDelete.getRight().isRealNode()) { //nodeToDelete is an internal leaf
+            IAVLNode externalNode = new AVLNode();
+            if (nodeToDelete.getKey() == nodeToDelete.getParent().getLeft().getKey()) { // nodeToDelete is a left child
+                nodeToDelete.getParent().setLeft(externalNode);
+                if (!nodeToDelete.getParent().getRight().isRealNode()) { // parent is now internal leaf
+                    ((AVLNode) nodeToDelete.getParent()).setHeightAfterDelete();
+                    nodeToDelete.setParent(null);
+                }
+            } else { //nodeToDelete is a right child
+                nodeToDelete.getParent().setRight(externalNode);
+                if (!nodeToDelete.getParent().getLeft().isRealNode()) { // parent is now internal leaf
+                    ((AVLNode) nodeToDelete.getParent()).setHeightAfterDelete();
+                    nodeToDelete.setParent(null);
+                }
+            }
+        }
+
+        if (min == null) { /// this will be set after deletion was done
+            min = getNewMin();
+        }
         return 42;    // to be replaced by student code
     }
 
@@ -98,13 +131,25 @@ public class AVLTree {
      * Returns the info of the item with the smallest key in the tree,
      * or null if the tree is empty
      */
+//    public String min() {
+//        if (empty()) {
+//            return null;
+//        }
+//        IAVLNode root = getRoot();
+//        IAVLNode minNode = ((AVLNode) root).nodeMin();
+//        return minNode.getValue(); // to be replaced by student code
+//    }
     public String min() {
-        if (empty()) {
+        if (min == null) {
             return null;
         }
+        return min.getValue();
+    }
+
+    public IAVLNode getNewMin() {
         IAVLNode root = getRoot();
         IAVLNode minNode = ((AVLNode) root).nodeMin();
-        return minNode.getValue(); // to be replaced by student code
+        return minNode;
     }
 
     /**
@@ -270,6 +315,9 @@ public class AVLTree {
         public AVLNode(int k, String i) { // for regular nodes
             key = k;
             info = i;
+            left = new AVLNode();
+            right = new AVLNode();
+
         }
 
         public int getKey() {
@@ -324,11 +372,20 @@ public class AVLTree {
         public void setHeightAfterInsert() {
             setHeight(0);
             IAVLNode node = getParent();
-            if (node.getRight() == null || node.getLeft() == null) {
+            if (!node.getRight().isRealNode() || !node.getLeft().isRealNode()) {
                 while (node != null) {
                     node.setHeight(node.getHeight() + 1);
                     node = node.getParent();
                 }
+            }
+        }
+
+        public void setHeightAfterDelete() {
+            setHeight(getHeight() - 1);
+            IAVLNode node = getParent();
+            while (node != null) {
+                node.setHeight(Math.max(node.getLeft().getHeight(), node.getRight().getHeight()) + 1);
+                node = node.getParent();
             }
         }
 
@@ -338,7 +395,10 @@ public class AVLTree {
 
         public AVLNode nodeMin() {
             AVLNode node = left;
-            while (left.isRealNode()) {
+            if (!left.isRealNode()) { //added this
+                return this;
+            }
+            while (node.left.isRealNode()) {
                 node = node.left;
             }
             return node;
@@ -390,7 +450,7 @@ public class AVLTree {
 
         public AVLNode searchNode(int k) {
             if (!isRealNode()) {
-                return null;
+                return this;
             }
             if (key == k) {
                 return this;
@@ -406,18 +466,37 @@ public class AVLTree {
 
     public static void main(String[] args) {
         AVLTree tree = new AVLTree();
-        tree.insert(10, "10");
-        tree.insert(3, "3");
-        tree.insert(18, "18");
-        tree.insert(1, "1");
-        tree.insert(8, "8");
+        tree.insert(10, "ten");
+        tree.insert(3, "three");
+        tree.insert(18, "eighteen");
+        tree.insert(1, "one");
+        tree.insert(6, "six");
+        tree.insert(8, "eight");
+
         System.out.println("root = " + tree.getRoot().getKey());
         System.out.println("root height = " + tree.getRoot().getHeight());
         System.out.println("root.left = " + tree.getRoot().getLeft().getKey());
         System.out.println("root.left height = " + tree.getRoot().getLeft().getHeight());
-        System.out.println(tree.getRoot().getLeft().getLeft().getKey());
-        System.out.println(tree.getRoot().getLeft().getRight().getKey());
-        System.out.println(tree.getRoot().getRight().getKey());
+        System.out.println("root.right = " + tree.getRoot().getRight().getKey());
+        System.out.println("root.right height = " + tree.getRoot().getRight().getHeight());
+        System.out.println("root.left.left = " + tree.getRoot().getLeft().getLeft().getKey());
+        System.out.println("root.left.left height = " + tree.getRoot().getLeft().getLeft().getHeight());
+        IAVLNode node3 = ((AVLNode)tree.getRoot()).searchNode(3);
+//        System.out.println("successor of 3 is "+((AVLNode)node3).Successor().getValue());
+        tree.delete(18);
+        tree.delete(8);
+        tree.delete(1);
+        tree.delete(6);
+        System.out.println("root = " + tree.getRoot().getKey());
+        System.out.println("root height = " + tree.getRoot().getHeight());
+        System.out.println("root.left = " + tree.getRoot().getLeft().getKey());
+        System.out.println("root.left height = " + tree.getRoot().getLeft().getHeight());
+        System.out.println("root.right = " + tree.getRoot().getRight().getKey());
+        System.out.println("root.right height = " + tree.getRoot().getRight().getHeight());
+//        System.out.println(tree.search(18));
+        System.out.println("successor of 3 is "+((AVLNode)node3).Successor().getValue());
+
+
 
 
     }
