@@ -103,20 +103,13 @@ public class AVLTree {
         }
         IAVLNode nodeToDelete = ((AVLNode) root).searchNode(k);
         if (!nodeToDelete.getLeft().isRealNode() && !nodeToDelete.getRight().isRealNode()) { //nodeToDelete is an internal leaf
-            IAVLNode externalNode = new AVLNode();
-            if (nodeToDelete.getKey() == nodeToDelete.getParent().getLeft().getKey()) { // nodeToDelete is a left child
-                nodeToDelete.getParent().setLeft(externalNode);
-                if (!nodeToDelete.getParent().getRight().isRealNode()) { // parent is now internal leaf
-                    ((AVLNode) nodeToDelete.getParent()).setHeightAfterDelete();
-                    nodeToDelete.setParent(null);
-                }
-            } else { //nodeToDelete is a right child
-                nodeToDelete.getParent().setRight(externalNode);
-                if (!nodeToDelete.getParent().getLeft().isRealNode()) { // parent is now internal leaf
-                    ((AVLNode) nodeToDelete.getParent()).setHeightAfterDelete();
-                    nodeToDelete.setParent(null);
-                }
-            }
+            ((AVLNode) nodeToDelete).deleteInternalLeaf();
+        }
+        if (nodeToDelete.getLeft().isRealNode() && nodeToDelete.getRight().isRealNode()) { //nodeToDelete has two children
+
+        }
+        else {
+            ((AVLNode) nodeToDelete).deleteNodeWithOneChild();
         }
 
         if (min == null) { /// this will be set after deletion was done
@@ -380,13 +373,63 @@ public class AVLTree {
             }
         }
 
-        public void setHeightAfterDelete() {
+        public void setHeightAfterDeleteInternalLeaf() {
+            if (!isRealNode()) {
+                return;
+            }
             setHeight(getHeight() - 1);
             IAVLNode node = getParent();
             while (node != null) {
                 node.setHeight(Math.max(node.getLeft().getHeight(), node.getRight().getHeight()) + 1);
                 node = node.getParent();
             }
+        }
+        public void setHeightAfterDeleteLeafWithOneChild() {
+            if (!isRealNode()) {
+                return;
+            }
+            setHeight(getHeight() + 1);
+            this.left.setHeightAfterDeleteLeafWithOneChild();
+            this.right.setHeightAfterDeleteLeafWithOneChild();
+        }
+
+
+        public void deleteInternalLeaf() {
+            IAVLNode externalNode = new AVLNode();
+            if (this.getKey() == this.getParent().getLeft().getKey()) { // nodeToDelete is a left child
+                this.getParent().setLeft(externalNode);
+                if (!this.getParent().getRight().isRealNode()) { // parent is now internal leaf
+                    ((AVLNode) this.getParent()).setHeightAfterDeleteInternalLeaf();
+                    this.setParent(null);
+                }
+            } else { //nodeToDelete is a right child
+                this.getParent().setRight(externalNode);
+                if (!this.getParent().getLeft().isRealNode()) { // parent is now internal leaf
+                    ((AVLNode) this.getParent()).setHeightAfterDeleteInternalLeaf();
+                    this.setParent(null);
+                }
+            }
+        }
+
+        public void deleteNodeWithOneChild() {
+            IAVLNode externalNode = new AVLNode();
+            if (this.getKey() == this.getParent().getLeft().getKey()) { // nodeToDelete is a left child
+                if (this.getLeft().isRealNode()) { // the child is a left child
+                    this.getParent().setLeft(this.getLeft());
+                } else { // the child is a right child
+                    this.getParent().setLeft(this.getRight());
+                }
+                ((AVLNode) this.getParent().getLeft()).setHeightAfterDeleteLeafWithOneChild();
+            } else { //nodeToDelete is a right child
+
+                if (this.getLeft().isRealNode()) { // the child is a left child
+                    this.getParent().setRight(this.getLeft());
+                } else { // the child is a right child
+                    this.getParent().setRight(this.getRight());
+                }
+                ((AVLNode) this.getParent().getRight()).setHeightAfterDeleteLeafWithOneChild();
+            }
+            this.setParent(null);
         }
 
         public int getHeight() {
@@ -469,34 +512,35 @@ public class AVLTree {
         tree.insert(10, "ten");
         tree.insert(3, "three");
         tree.insert(18, "eighteen");
+        tree.insert(8, "eight");
         tree.insert(1, "one");
         tree.insert(6, "six");
-        tree.insert(8, "eight");
-
+        tree.insert(2,"two");
         System.out.println("root = " + tree.getRoot().getKey());
         System.out.println("root height = " + tree.getRoot().getHeight());
         System.out.println("root.left = " + tree.getRoot().getLeft().getKey());
         System.out.println("root.left height = " + tree.getRoot().getLeft().getHeight());
         System.out.println("root.right = " + tree.getRoot().getRight().getKey());
         System.out.println("root.right height = " + tree.getRoot().getRight().getHeight());
-        System.out.println("root.left.left = " + tree.getRoot().getLeft().getLeft().getKey());
-        System.out.println("root.left.left height = " + tree.getRoot().getLeft().getLeft().getHeight());
-        IAVLNode node3 = ((AVLNode)tree.getRoot()).searchNode(3);
-//        System.out.println("successor of 3 is "+((AVLNode)node3).Successor().getValue());
+        System.out.println("root.left.right = " + tree.getRoot().getLeft().getRight().getKey());
+        System.out.println("root.left.right height = " + tree.getRoot().getLeft().getRight().getHeight());
+//        IAVLNode node3 = ((AVLNode) tree.getRoot()).searchNode(3);
+//        System.out.println("successor of 3 is " + ((AVLNode) node3).Successor().getValue());
         tree.delete(18);
         tree.delete(8);
-        tree.delete(1);
-        tree.delete(6);
+        System.out.println("deleted 18 and 8");
+//        tree.delete(1);
+//        tree.delete(6);
         System.out.println("root = " + tree.getRoot().getKey());
         System.out.println("root height = " + tree.getRoot().getHeight());
         System.out.println("root.left = " + tree.getRoot().getLeft().getKey());
         System.out.println("root.left height = " + tree.getRoot().getLeft().getHeight());
         System.out.println("root.right = " + tree.getRoot().getRight().getKey());
         System.out.println("root.right height = " + tree.getRoot().getRight().getHeight());
+        System.out.println("root.left.right = " + tree.getRoot().getLeft().getRight().getKey());
+        System.out.println("root.left.right height = " + tree.getRoot().getLeft().getRight().getHeight());
 //        System.out.println(tree.search(18));
-        System.out.println("successor of 3 is "+((AVLNode)node3).Successor().getValue());
-
-
+//        System.out.println("successor of 3 is " + ((AVLNode) node3).Successor().getValue());
 
 
     }
