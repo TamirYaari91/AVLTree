@@ -192,7 +192,7 @@ public class AVLTree {
     public int size() {
         IAVLNode root = getRoot();
 //        return ((AVLNode) root).sizeNode(); // to be replaced by student code
-        return ((AVLNode) root).size + ((AVLNode) root).left.size + ((AVLNode) root).right.size; // to be replaced by student code
+        return 1 + ((AVLNode) root).left.size + ((AVLNode) root).right.size; // to be replaced by student code
     }
 
     /**
