@@ -13,7 +13,8 @@ public class AVLTree {
     public IAVLNode root;
 
     public AVLTree() {
-            root = null;}
+        root = null;
+    }
 
     /**
      * public boolean empty()
@@ -48,7 +49,7 @@ public class AVLTree {
      * returns -1 if an item with key k already exists in the tree.
      */
     public int insert(int k, String i) {
-        IAVLNode node = new AVLNode(k,i);
+        IAVLNode node = new AVLNode(k, i);
         if (root == null) {
             root = node;
             root.setHeight(0);
@@ -60,30 +61,15 @@ public class AVLTree {
                 if (root.getLeft() == null) {
                     root.setLeft(node);
                     node.setParent(root);
-                    node.setHeight(0);
-                    if (root.getRight() == null) {
-                        while (root.getParent() != null) {
-                            root.setHeight(root.getHeight() + 1);
-                            root = root.getParent();
-                        }
-                        root.setHeight(root.getHeight() + 1);
-                    }
+                    ((AVLNode) node).setHeightAfterInsert();
                     return 42;
                 }
                 root = root.getLeft();
-            }
-            else {
-                if(root.getRight() == null) {
+            } else {
+                if (root.getRight() == null) {
                     root.setRight(node);
                     node.setParent(root);
-                    node.setHeight(0);
-                    if (root.getLeft() == null) {
-                        while (root.getParent() != null) {
-                            root.setHeight(root.getHeight() + 1);
-                            root = root.getParent();
-                        }
-                        root.setHeight(root.getHeight() + 1);
-                    }
+                    ((AVLNode) node).setHeightAfterInsert();
                     return 42;
                 }
                 root = root.getRight();
@@ -176,7 +162,8 @@ public class AVLTree {
             minNode = ((AVLNode) minNode).Successor();
             arr[i] = minNode.getValue();
         }
-        return arr;         }
+        return arr;
+    }
 
     /**
      * public int size()
@@ -229,7 +216,6 @@ public class AVLTree {
     public int join(IAVLNode x, AVLTree t) {
         return 0;
     }
-
 
 
     /**
@@ -335,6 +321,17 @@ public class AVLTree {
             height = h;
         }
 
+        public void setHeightAfterInsert() {
+            setHeight(0);
+            IAVLNode node = getParent();
+            if (node.getRight() == null || node.getLeft() == null) {
+                while (node != null) {
+                    node.setHeight(node.getHeight() + 1);
+                    node = node.getParent();
+                }
+            }
+        }
+
         public int getHeight() {
             return height;
         }
@@ -409,15 +406,15 @@ public class AVLTree {
 
     public static void main(String[] args) {
         AVLTree tree = new AVLTree();
-        tree.insert(10,"10");
-        tree.insert(3,"3");
-        tree.insert(18,"18");
-        tree.insert(1,"1");
-        tree.insert(8,"8");
-        System.out.println("root = "+ tree.getRoot().getKey());
-        System.out.println("root height = "+ tree.getRoot().getHeight());
-        System.out.println("root.left = "+tree.getRoot().getLeft().getKey());
-        System.out.println("root.left height = "+tree.getRoot().getLeft().getHeight());
+        tree.insert(10, "10");
+        tree.insert(3, "3");
+        tree.insert(18, "18");
+        tree.insert(1, "1");
+        tree.insert(8, "8");
+        System.out.println("root = " + tree.getRoot().getKey());
+        System.out.println("root height = " + tree.getRoot().getHeight());
+        System.out.println("root.left = " + tree.getRoot().getLeft().getKey());
+        System.out.println("root.left height = " + tree.getRoot().getLeft().getHeight());
         System.out.println(tree.getRoot().getLeft().getLeft().getKey());
         System.out.println(tree.getRoot().getLeft().getRight().getKey());
         System.out.println(tree.getRoot().getRight().getKey());
