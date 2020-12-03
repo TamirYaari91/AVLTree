@@ -14,11 +14,13 @@ public class AVLTreeDraft {
 
     IAVLNode root;
     IAVLNode min;
+    IAVLNode max;
     int size;
 
     public AVLTreeDraft() {
         root = null;
         min = null;
+        max = null;
         size = 0;
     }
 
@@ -59,11 +61,15 @@ public class AVLTreeDraft {
         if (root == null) {
             root = node;
             min = node;
+            max = node;
             root.setHeight(0);
             return 0;
         }
         if (node.getKey() < min.getKey()) {
             min = node;
+        }
+        if (node.getKey() > max.getKey()) {
+            max = node;
         }
         IAVLNode root = getRoot();
         while (node.getParent() == null) {
@@ -96,6 +102,46 @@ public class AVLTreeDraft {
      * returns -1 if an item with key k was not found in the tree.
      */
     public int delete(int k) {
+        IAVLNode node = this.root;
+        IAVLNode toDelete = ((AVLNode) node).searchNode(k);
+        if (toDelete == null) {
+            return -1;
+        }
+        if (size() == 1) {
+            root = null;
+            min = null;
+            max = null;
+            size = 0;
+        }
+        if (toDelete.getHeight() == 0){ //deleting a leaf
+            IAVLNode parent = toDelete.getParent();
+            if (parent.getLeft() == toDelete) {
+                 parent.setLeft(new AVLNode());
+            }
+            else {
+                parent.setRight(new AVLNode());
+            }
+        }
+        if (((AVLNode)toDelete).getSize() == 2) { //deleting a unary node
+            IAVLNode parent = toDelete.getParent();
+            if (parent.getLeft() == toDelete) {
+                if (toDelete.getLeft().getHeight() == 0) {
+                    parent.setLeft(toDelete.getLeft());
+                }
+                else {
+                    parent.setLeft(toDelete.getRight());
+                }
+            }
+            else {
+                if (toDelete.getLeft().getHeight() == 0) {
+                    parent.setRight(toDelete.getLeft());
+                }
+                else {
+                    parent.setRight(toDelete.getRight());
+                }
+            }
+        }
+
         return 42;    // to be replaced by student code
     }
 
@@ -382,6 +428,10 @@ public class AVLTreeDraft {
             rotateRight();
             rotateLeft();
         }
+        public String whatCaseDelete() {
+
+            return "";
+        }
 
         /** 21 - case 2 rotateleft
          * 22 - case 2 rotateRight
@@ -389,7 +439,7 @@ public class AVLTreeDraft {
          * 32 - case 3 rotaterightleft
          * @return
          */
-        public int whatCase() {
+        public int whatCaseInsert() {
             if (getRoot() == this) {
                 return 23;
             }
@@ -448,27 +498,27 @@ public class AVLTreeDraft {
 
         public void rebalancing() {
             IAVLNode node = this;
-            if ((((AVLNode) node).whatCase() == 0) || ((getParent() != null) && (getParent().getParent() != null))) {}
-            while ((((AVLNode) node).whatCase() == 1) && (node != root)) {
+            if ((((AVLNode) node).whatCaseInsert() == 0) || ((getParent() != null) && (getParent().getParent() != null))) {}
+            while ((((AVLNode) node).whatCaseInsert() == 1) && (node != root)) {
                 node = node.getParent();
                 ((AVLNode) node).setHeightAfterInsert();
                 ((AVLNode) node).updateSize();
             }
-            if (((AVLNode) node).whatCase() == 22)  {
+            if (((AVLNode) node).whatCaseInsert() == 22)  {
                 System.out.println("case 2 R");
                 ((AVLNode) node).rotateRight();
                 ((AVLNode) node.getRight()).demote();
                 ((AVLNode) node.getRight()).updateSize();
                 ((AVLNode) node).updateSize();
             }
-            if (((AVLNode) node).whatCase() == 21)  {
+            if (((AVLNode) node).whatCaseInsert() == 21)  {
                 System.out.println("case 2 L");
                 ((AVLNode) node).rotateLeft();
                 ((AVLNode) node.getLeft()).demote();
                 ((AVLNode) node.getLeft()).updateSize();
                 ((AVLNode) node).updateSize();
             }
-            if (((AVLNode) node).whatCase() == 31)  {
+            if (((AVLNode) node).whatCaseInsert() == 31)  {
                 System.out.println("case 3 LR");
                 ((AVLNode) node.getRight()).rotateLeftRight();
                 ((AVLNode) node).demote();
@@ -479,7 +529,7 @@ public class AVLTreeDraft {
                 ((AVLNode) node.getParent()).updateSize();
 
             }
-            if (((AVLNode) node).whatCase() == 32)  {
+            if (((AVLNode) node).whatCaseInsert() == 32)  {
                 System.out.println("case 3 RL");
                 ((AVLNode) node.getLeft()).rotateRightLeft();
                 ((AVLNode) node).demote();
@@ -489,6 +539,34 @@ public class AVLTreeDraft {
                 ((AVLNode) node.getParent()).promote();
                 ((AVLNode) node.getParent()).updateSize();
             }
+        }
+
+        public int DeleteUnary() {
+            if (this == root) {
+                if (this.getLeft().getHeight() == 0) {
+                    root = this.getLeft();
+                } else {
+                    root = this.getRight();
+                }
+                return 0;
+            }
+            if (this.getSize() == 2) { //deleting a unary node
+                IAVLNode parent = this.getParent();
+                if (parent.getLeft() == this) {
+                    if (this.getLeft().getHeight() == 0) {
+                        parent.setLeft(this.getLeft());
+                    } else {
+                        parent.setLeft(this.getRight());
+                    }
+                } else {
+                    if (this.getLeft().getHeight() == 0) {
+                        parent.setRight(this.getLeft());
+                    } else {
+                        parent.setRight(this.getRight());
+                    }
+                }
+            }
+            return 44;
         }
 
 
@@ -659,7 +737,7 @@ public class AVLTreeDraft {
         tree.insert(17, "eight");
         tree.insert(23, "twelve");
         //tree.insert(9, "nine");
-        tree.insert(16, "eleven");
+        tree.insert(21, "eleven");
         //tree.insert(13, "thirteen");
 //
 //        int[] keys = tree.keysToArray();
