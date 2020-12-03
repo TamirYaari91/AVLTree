@@ -362,16 +362,16 @@ public class AVLTreeDraft {
             setHeight(rank-1);
         }
         public void promote() {
-            int rank = getSize();
-            setSize(rank+1);
-        }
-        public void demoteSize() {
-            int rank = getSize();
-            setSize(rank-1);
-        }
-        public void promoteSize() {
             int rank = getHeight();
             setHeight(rank+1);
+        }
+        public void demoteSize() {
+            int size = getSize();
+            setSize(size-1);
+        }
+        public void promoteSize() {
+            int size = getSize();
+            setSize(size+1);
         }
         public void rotateLeftRight() {
             rotateLeft();
