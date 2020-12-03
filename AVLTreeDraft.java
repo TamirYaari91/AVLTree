@@ -226,7 +226,7 @@ public class AVLTreeDraft {
     }
 
     /**
-     * public join(IAVLNode x, AVLTree t)
+     * public join(IAVLNode x, AVLTreeDraft t)
      * <p>
      * joins t and x with the tree.
      * Returns the complexity of the operation (|tree.rank - t.rank| + 1).
@@ -383,7 +383,7 @@ public class AVLTreeDraft {
             rotateLeft();
         }
 
-        //        public int whatCase() {
+//        public int whatCase() {
 //            if (getRoot() == this) {
 //                return 23;
 //            }
@@ -422,6 +422,13 @@ public class AVLTreeDraft {
 //            }
 //            return 554;
 //        }
+
+        /** 21 - case 2 rotateleft
+         * 22 - case 2 rotateRight
+         * 31 - case 3 rotateleftright
+         * 32 - case 3 rotaterightleft
+         * @return
+         */
         public int whatCase() {
             if (getRoot() == this) {
                 return 23;
@@ -444,11 +451,11 @@ public class AVLTreeDraft {
                         && (parent.getHeight() - sibling.getHeight() == 2 )) {
                     if ((this.getHeight() - childLeft.getHeight() == 1)
                             && (this.getHeight() - childRight.getHeight() == 2)) {
-                        return 2;
+                        return 22;
                     }
                     if ((this.getHeight() - childLeft.getHeight() == 2)
                             && (this.getHeight() - childRight.getHeight() == 1)) {
-                        return 3;
+                        return 31;
                     }
                 }
             }
@@ -468,11 +475,11 @@ public class AVLTreeDraft {
                         && (parent.getHeight() - sibling.getHeight() == 2 )) {
                     if ((this.getHeight() - childLeft.getHeight() == 1)
                             && (this.getHeight() - childRight.getHeight() == 2)) {
-                        return 3;
+                        return 32;
                     }
                     if ((this.getHeight() - childLeft.getHeight() == 2)
                             && (this.getHeight() - childRight.getHeight() == 1)) {
-                        return 2;
+                        return 21;
                     }
                 }
             }
@@ -487,19 +494,19 @@ public class AVLTreeDraft {
                 ((AVLNode) node).setHeightAfterInsert();
                 ((AVLNode) node).setSizeAfterInsert();
             }
-            if ((((AVLNode) node).whatCase() == 2) && (getParent().getLeft() == this)) {
-                System.out.println("case 2 L");
-                ((AVLNode) node).rotateLeft();
-                ((AVLNode) node.getLeft()).demote();
-                ((AVLNode) node.getLeft()).demoteSize();
-            }
-            if ((((AVLNode) node).whatCase() == 2) && (getParent().getRight() == this)) {
+            if (((AVLNode) node).whatCase() == 22)  {
                 System.out.println("case 2 R");
                 ((AVLNode) node).rotateRight();
                 ((AVLNode) node.getRight()).demote();
-                ((AVLNode) node.getRight()).demoteSize();
+                //((AVLNode) node.getLeft()).demoteSize();
             }
-            if ((((AVLNode) node).whatCase() == 3) && (getParent().getLeft() == this)) {
+            if (((AVLNode) node).whatCase() == 21)  {
+                System.out.println("case 2 L");
+                ((AVLNode) node).rotateLeft();
+                ((AVLNode) node.getLeft()).demote();
+                //((AVLNode) node.getRight()).demoteSize();
+            }
+            if (((AVLNode) node).whatCase() == 31)  {
                 System.out.println("case 3 LR");
                 ((AVLNode) node.getRight()).rotateLeftRight();
                 ((AVLNode) node).demote();
@@ -510,7 +517,7 @@ public class AVLTreeDraft {
                 ((AVLNode) node.getParent().getRight()).demoteSize();
 
             }
-            if ((((AVLNode) node).whatCase() == 3) && (getParent().getRight() == this)) {
+            if (((AVLNode) node).whatCase() == 32)  {
                 System.out.println("case 3 RL");
                 ((AVLNode) node.getLeft()).rotateRightLeft();
                 ((AVLNode) node).demote();
@@ -666,35 +673,35 @@ public class AVLTreeDraft {
 
     public static void main(String[] args) {
         AVLTreeDraft tree = new AVLTreeDraft();
-//        tree.insert(1, "one");
+//        tree.insert(3, "one");
 //        tree.insert(2, "two");
-//        tree.insert(3, "three");
+//        tree.insert(1, "three");
 //        int[] keys = tree.keysToArray();
 //        System.out.println(Arrays.toString(keys));
 //        System.out.println("root = " + tree.getRoot().getKey() + " ");
 //        System.out.println("root.left = " + tree.getRoot().getLeft().getKey());
 //        System.out.println("root.right = " + tree.getRoot().getRight().getKey());
 
-        tree.insert(15, "fifteen");
-        tree.insert(17, "seventeen");
-        tree.insert(10, "ten");
-        tree.insert(8, "eight");
-        tree.insert(12, "twelve");
-        tree.insert(9, "nine");
-        //tree.insert(11, "eleven");
-        //tree.insert(13, "thirteen");
+//        tree.insert(15, "fifteen");
+//        tree.insert(17, "seventeen");
+//        tree.insert(10, "ten");
+//        tree.insert(8, "eight");
+//        tree.insert(12, "twelve");
+//        tree.insert(9, "nine");
+//        tree.insert(11, "eleven");
+//        tree.insert(13, "thirteen");
 
-//        tree.insert(10, "fifteen");
-//        tree.insert(9, "seventeen");
-//        tree.insert(17, "ten");
-//        tree.insert(13, "eight");
-//        tree.insert(19, "twelve");
-//        //tree.insert(9, "nine");
-//        tree.insert(18, "eleven");
-//        //tree.insert(13, "thirteen");
+        tree.insert(15, "fifteen");
+        tree.insert(10, "seventeen");
+        tree.insert(20, "ten");
+        tree.insert(17, "eight");
+        tree.insert(23, "twelve");
+        //tree.insert(9, "nine");
+        tree.insert(16, "eleven");
+        //tree.insert(13, "thirteen");
 //
-        int[] keys = tree.keysToArray();
-        System.out.println(Arrays.toString(keys));
+//        int[] keys = tree.keysToArray();
+//        System.out.println(Arrays.toString(keys));
         System.out.println("root = " + tree.getRoot().getKey()+" height= "+tree.getRoot().getHeight());
         System.out.println("root.left = " + tree.getRoot().getLeft().getKey()+" height= "+tree.getRoot().getLeft().getHeight());
         System.out.println("root.right = " + tree.getRoot().getRight().getKey()+" height= "+tree.getRoot().getRight().getHeight());
