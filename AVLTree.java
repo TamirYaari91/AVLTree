@@ -18,7 +18,7 @@ public class AVLTree {
     int size;
 
     public AVLTree() {
-        root = null;
+        root = new AVLNode();
         min = null;
         max = null;
         size = 0;
@@ -30,7 +30,8 @@ public class AVLTree {
      * returns true if and only if the tree is empty
      */
     public boolean empty() {
-        return root == null;// to be replaced by student code
+        return !root.isRealNode();// to be replaced by student code
+
     }
 
     /**
@@ -57,13 +58,14 @@ public class AVLTree {
      * returns -1 if an item with key k already exists in the tree.
      */
     public int insert(int k, String i) {
-//        System.out.println("inserting node = "+k);
+//        System.out.println("inserting node = " + k);
         IAVLNode node = new AVLNode(k, i);
-        if (root == null) {
+        if (!root.isRealNode()) {
             root = node;
             min = node;
             max = node;
             root.setHeight(0);
+            size = 1;
             return 0;
         }
         if (node.getKey() < min.getKey()) {
@@ -78,6 +80,7 @@ public class AVLTree {
                 if (!root.getLeft().isRealNode()) {
                     root.setLeft(node);
                     ((AVLNode) node).rebalancingInsert();
+                    size = ((AVLNode) getRoot()).getSize();
                     return 42;
                 }
                 root = root.getLeft();
@@ -85,11 +88,13 @@ public class AVLTree {
                 if (!root.getRight().isRealNode()) {
                     root.setRight(node);
                     ((AVLNode) node).rebalancingInsert();
+                    size = ((AVLNode) getRoot()).getSize();
                     return 42;
                 }
                 root = root.getRight();
             }
         }
+        size = ((AVLNode) getRoot()).getSize();
         return 42;    // to be replaced by student code
     }
 
@@ -102,6 +107,8 @@ public class AVLTree {
      * demotion/rotation - counted as one rebalnce operation, double-rotation is counted as 2.
      * returns -1 if an item with key k was not found in the tree.
      */
+
+
     public int delete(int k) {
         IAVLNode node = this.root;
         IAVLNode toDelete = ((AVLNode) node).searchNode(k);
@@ -109,7 +116,7 @@ public class AVLTree {
             return -1;
         }
         if (size() == 1) {
-            root = null;
+            root = new AVLNode();
             min = null;
             max = null;
             size = 0;
@@ -129,28 +136,55 @@ public class AVLTree {
                 parent.setRight(new AVLNode());
             }
             ((AVLNode) parent).rebalancingDelete();
+            size = ((AVLNode) getRoot()).getSize();
             return 232;
         }
         if (((AVLNode) toDelete).getSize() == 2) { //deleting a unary node
             ((AVLNode) toDelete).deleteUnary();
-            ((AVLNode) parent).rebalancingDelete();
+            if (parent != null) {
+                ((AVLNode) parent).rebalancingDelete();
+            }
+            size = ((AVLNode) getRoot()).getSize();
             return 2322;
         }
         IAVLNode successor = ((AVLNode) toDelete).Successor();
+        IAVLNode successorParent = ((AVLNode) toDelete).Successor().getParent();
         ((AVLNode) successor).deleteUnary();
         successor.setLeft(toDelete.getLeft());
         successor.setRight(toDelete.getRight());
+        node = successorParent;
+        while (node != successor.getLeft() && node != successor.getRight() && node != null) {
+            ((AVLNode) node).updateSize();
+            node = node.getParent();
+        }
+        ((AVLNode) successor.getLeft()).updateSize();
+        ((AVLNode) successor.getRight()).updateSize();
+        ((AVLNode) successor).setHeightAfterInsert();
+        ((AVLNode) successor).updateSize();
         if (toDelete == root) {
             root = successor;
+            root.setParent(null);
         } else {
             successor.setParent(toDelete.getParent());
+            if (toDelete == toDelete.getParent().getLeft()) {
+                toDelete.getParent().setLeft(successor);
+            } else {
+                toDelete.getParent().setRight(successor);
+            }
         }
-        if (toDelete == toDelete.getParent().getLeft()) {
-            toDelete.getParent().setLeft(successor);
+        if (toDelete.getParent() != null) {
+            if (successorParent == toDelete) {
+                successor.setParent(toDelete.getParent());
+                ((AVLNode) successor).setHeightAfterInsert();
+                ((AVLNode) successor).rebalancingDelete();
+            } else {
+                ((AVLNode) successorParent).rebalancingDelete();
+            }
         } else {
-            toDelete.getParent().setRight(successor);
+            ((AVLNode) successor.getRight()).rebalancingDelete();
+            ((AVLNode) successor).rebalancingDelete();
         }
-        ((AVLNode) parent).rebalancingDelete();
+        size = ((AVLNode) getRoot()).getSize();
         return 42;    // to be replaced by student code
     }
 
@@ -160,14 +194,7 @@ public class AVLTree {
      * Returns the info of the item with the smallest key in the tree,
      * or null if the tree is empty
      */
-//    public String min() {
-//        if (empty()) {
-//            return null;
-//        }
-//        IAVLNode root = getRoot();
-//        IAVLNode minNode = ((AVLNode) root).nodeMin();
-//        return minNode.getValue(); // to be replaced by student code
-//    }
+
     public String min() {
         if (min == null) {
             return null;
@@ -250,7 +277,6 @@ public class AVLTree {
     public int size() {
         IAVLNode root = getRoot();
         return ((AVLNode) root).sizeNode(); // to be replaced by student code
-        // return 1 + ((AVLNode) root).left.size + ((AVLNode) root).right.size; // to be replaced by student code
     }
 
     /**
@@ -262,9 +288,6 @@ public class AVLTree {
      * postcondition: none
      */
     public IAVLNode getRoot() {
-        if (empty()) {
-            return null;
-        }
         return root;
     }
 
@@ -291,6 +314,7 @@ public class AVLTree {
     public int join(IAVLNode x, AVLTree t) {
         return 0;
     }
+
 
     /**
      * public interface IAVLNode
@@ -366,7 +390,6 @@ public class AVLTree {
         }
 
         public void rotateRight() {
-//            if ((getParent() != null) && (getParent().getParent() != null)) {}
             IAVLNode parent = getParent();
             IAVLNode grandpa = getParent().getParent();
             IAVLNode rightChild = getRight();
@@ -388,7 +411,6 @@ public class AVLTree {
         }
 
         public void rotateLeft() {
-//            if ((getParent() != null) && (getParent().getParent() != null)) {}
             IAVLNode parent = getParent();
             IAVLNode grandpa = getParent().getParent();
             IAVLNode leftChild = getLeft();
@@ -481,6 +503,9 @@ public class AVLTree {
                     ((AVLNode) node).demote();
                     ((AVLNode) node).updateSize();
                     node = node.getParent();
+                    if (node == null) {
+                        break;
+                    }
                     continue;
                 }
                 if (((AVLNode) node).whatCaseDelete().equals("case 3 rotateLeft")) {
@@ -491,6 +516,9 @@ public class AVLTree {
                     ((AVLNode) node.getParent()).updateSize();
                     node = node.getParent();
                     node = node.getParent();
+                    if (node == null) {
+                        break;
+                    }
                     continue;
                 }
                 if (((AVLNode) node).whatCaseDelete().equals("case 3 rotateRight")) {
@@ -501,6 +529,9 @@ public class AVLTree {
                     ((AVLNode) node.getParent()).updateSize();
                     node = node.getParent();
                     node = node.getParent();
+                    if (node == null) {
+                        break;
+                    }
                     continue;
                 }
                 if (((AVLNode) node).whatCaseDelete().equals("case 4 rotateRightLeft")) {
@@ -514,6 +545,9 @@ public class AVLTree {
                     ((AVLNode) node.getParent()).updateSize();
                     node = node.getParent();
                     node = node.getParent();
+                    if (node == null) {
+                        break;
+                    }
                     continue;
                 }
                 if (((AVLNode) node).whatCaseDelete().equals("case 4 rotateLeftRight")) {
@@ -527,26 +561,39 @@ public class AVLTree {
                     ((AVLNode) node.getParent()).updateSize();
                     node = node.getParent();
                     node = node.getParent();
+                    if (node == null) {
+                        break;
+                    }
                     continue;
                 }
-//                node = node.getParent();
                 break;
             }
-            if (((AVLNode) node).whatCaseDelete().equals("case 2 rotateLeft")) {
-                ((AVLNode) node.getRight()).rotateLeft();
-                ((AVLNode) node).demote();
-                ((AVLNode) node.getParent()).promote();
-                ((AVLNode) node).updateSize();
-                ((AVLNode) node.getParent()).updateSize();
+            if (node != null) {
+                if (((AVLNode) node).whatCaseDelete().equals("case 2 rotateLeft")) {
+                    ((AVLNode) node.getRight()).rotateLeft();
+                    ((AVLNode) node).demote();
+                    ((AVLNode) node.getParent()).promote();
+                    ((AVLNode) node).updateSize();
+                    ((AVLNode) node.getParent()).updateSize();
+                }
+                if (((AVLNode) node).whatCaseDelete().equals("case 2 rotateRight")) {
+                    ((AVLNode) node.getLeft()).rotateRight();
+                    ((AVLNode) node).demote();
+                    ((AVLNode) node.getParent()).promote();
+                    ((AVLNode) node).updateSize();
+                    ((AVLNode) node.getParent()).updateSize();
+                }
+                if (((AVLNode) node).whatCaseDelete().equals("nothing")) {
+                    while (node.getParent() != null) {
+                        ((AVLNode) node).updateSize();
+//                        ((AVLNode) node).setHeightAfterInsert();
+                        node = node.getParent();
+                    }
+                }
             }
-            if (((AVLNode) node).whatCaseDelete().equals("case 2 rotateRight")) {
-                ((AVLNode) node.getLeft()).rotateRight();
-                ((AVLNode) node).demote();
-                ((AVLNode) node.getParent()).promote();
+            if (node != null) {
                 ((AVLNode) node).updateSize();
-                ((AVLNode) node.getParent()).updateSize();
             }
-            ((AVLNode) node).updateSize();
 
         }
 
@@ -560,6 +607,7 @@ public class AVLTree {
          * @return
          */
         public int whatCaseInsert() {
+//            System.out.println("whatCaseInsert for key = " + getKey());
             if (getRoot() == this) {
                 return 23;
             }
@@ -569,14 +617,12 @@ public class AVLTree {
                 sibling = getParent().getRight();
                 if (((parent.getHeight() - this.getHeight() == 1)
                         && (parent.getHeight() - sibling.getHeight() == 1)) ||
-                        ((parent.getHeight() - this.getHeight() == 1)  && (parent.getHeight() - sibling.getHeight() == 2))
-                        || ((parent.getHeight() - this.getHeight() == 2)  && (parent.getHeight() - sibling.getHeight() == 1)))  {
-//                    System.out.println("0");
+                        ((parent.getHeight() - this.getHeight() == 1) && (parent.getHeight() - sibling.getHeight() == 2))
+                        || ((parent.getHeight() - this.getHeight() == 2) && (parent.getHeight() - sibling.getHeight() == 1))) {
                     return 0;
                 }
                 if ((parent.getHeight() - this.getHeight() == 0)
                         && (parent.getHeight() - sibling.getHeight() == 1)) {
-//                    System.out.println("1");
                     return 1;
                 }
                 IAVLNode childLeft = getLeft();
@@ -585,12 +631,10 @@ public class AVLTree {
                         && (parent.getHeight() - sibling.getHeight() == 2)) {
                     if ((this.getHeight() - childLeft.getHeight() == 1)
                             && (this.getHeight() - childRight.getHeight() == 2)) {
-//                        System.out.println("22");
                         return 22;
                     }
                     if ((this.getHeight() - childLeft.getHeight() == 2)
                             && (this.getHeight() - childRight.getHeight() == 1)) {
-//                        System.out.println("31");
                         return 31;
                     }
                 }
@@ -598,14 +642,12 @@ public class AVLTree {
                 sibling = getParent().getLeft();
                 if (((parent.getHeight() - this.getHeight() == 1)
                         && (parent.getHeight() - sibling.getHeight() == 1)) ||
-                        ((parent.getHeight() - this.getHeight() == 1)  && (parent.getHeight() - sibling.getHeight() == 2)) ||
-                        ((parent.getHeight() - this.getHeight() == 2)  && (parent.getHeight() - sibling.getHeight() == 1)))  {
-//                    System.out.println("00");
+                        ((parent.getHeight() - this.getHeight() == 1) && (parent.getHeight() - sibling.getHeight() == 2)) ||
+                        ((parent.getHeight() - this.getHeight() == 2) && (parent.getHeight() - sibling.getHeight() == 1))) {
                     return 0;
                 }
                 if ((parent.getHeight() - this.getHeight() == 0)
                         && (parent.getHeight() - sibling.getHeight() == 1)) {
-//                    System.out.println("11");
                     return 1;
                 }
                 IAVLNode childLeft = getLeft();
@@ -614,72 +656,76 @@ public class AVLTree {
                         && (parent.getHeight() - sibling.getHeight() == 2)) {
                     if ((this.getHeight() - childLeft.getHeight() == 1)
                             && (this.getHeight() - childRight.getHeight() == 2)) {
-//                        System.out.println("32");
                         return 32;
                     }
                     if ((this.getHeight() - childLeft.getHeight() == 2)
                             && (this.getHeight() - childRight.getHeight() == 1)) {
-//                        System.out.println("21");
                         return 21;
                     }
                 }
             }
-//            System.out.println("end! key = " + getKey());
             return 554;
         }
 
         public void rebalancingInsert() {
             IAVLNode node = this;
-//            System.out.println(node.getKey());
-            while ((((AVLNode) node).whatCaseInsert() == 0) && (node != root)) {
-//                System.out.println("case 0");
-                node = node.getParent();
-                ((AVLNode) node).updateSize();
-            }
+            while (true) {
+                while ((((AVLNode) node).whatCaseInsert() == 0) && (node != root)) {
+//                    System.out.println("case 0 for key = " + getKey());
+                    node = node.getParent();
+                    ((AVLNode) node).updateSize();
+                }
 
-            ((AVLNode) node).updateSize();
-            while ((((AVLNode) node).whatCaseInsert() == 1) && (node != root)) {
-//                System.out.println("whatCaseInsert == 1, key = "+node.getKey());
-                node = node.getParent();
-                ((AVLNode) node).setHeightAfterInsert();
                 ((AVLNode) node).updateSize();
-            }
+                while ((((AVLNode) node).whatCaseInsert() == 1) && (node != root)) {
+//                    System.out.println("case 1 for key = " + node.getKey());
+                    node = node.getParent();
+                    ((AVLNode) node).setHeightAfterInsert();
+                    ((AVLNode) node).updateSize();
+                }
 
 //            ((AVLNode) node).updateSize();
-            if (((AVLNode) node).whatCaseInsert() == 22) {
-//                System.out.println("case 2 R");
-                ((AVLNode) node).rotateRight();
-                ((AVLNode) node.getRight()).demote();
-                ((AVLNode) node.getRight()).updateSize();
-                ((AVLNode) node).updateSize();
-            }
-            if (((AVLNode) node).whatCaseInsert() == 21) {
-//                System.out.println("case 2 L");
-                ((AVLNode) node).rotateLeft();
-                ((AVLNode) node.getLeft()).demote();
-                ((AVLNode) node.getLeft()).updateSize();
-                ((AVLNode) node).updateSize();
-            }
-            if (((AVLNode) node).whatCaseInsert() == 31) {
-//                System.out.println("case 3 LR");
-                ((AVLNode) node.getRight()).rotateLeftRight();
-                ((AVLNode) node).demote();
-                ((AVLNode) node).updateSize();
-                ((AVLNode) node.getParent().getRight()).demote();
-                ((AVLNode) node.getParent().getRight()).updateSize();
-                ((AVLNode) node.getParent()).promote();
-                ((AVLNode) node.getParent()).updateSize();
+                if (((AVLNode) node).whatCaseInsert() == 22) {
+//                    System.out.println("case 2 R for key = " + node.getKey());
+                    ((AVLNode) node).rotateRight();
+                    ((AVLNode) node.getRight()).demote();
+                    ((AVLNode) node.getRight()).updateSize();
+                    ((AVLNode) node).updateSize();
+                }
+                if (((AVLNode) node).whatCaseInsert() == 21) {
+//                    System.out.println("case 2 L for key = " + node.getKey());
+                    ((AVLNode) node).rotateLeft();
+                    ((AVLNode) node.getLeft()).demote();
+                    ((AVLNode) node.getLeft()).updateSize();
+                    ((AVLNode) node).updateSize();
+                }
+                if (((AVLNode) node).whatCaseInsert() == 31) {
+//                    System.out.println("case 3 LR for key = " + node.getKey());
+                    ((AVLNode) node.getRight()).rotateLeftRight();
+                    ((AVLNode) node).demote();
+                    ((AVLNode) node).updateSize();
+                    ((AVLNode) node.getParent().getRight()).demote();
+                    ((AVLNode) node.getParent().getRight()).updateSize();
+                    ((AVLNode) node.getParent()).promote();
+                    ((AVLNode) node.getParent()).updateSize();
 
-            }
-            if (((AVLNode) node).whatCaseInsert() == 32) {
-//                System.out.println("case 3 RL");
-                ((AVLNode) node.getLeft()).rotateRightLeft();
-                ((AVLNode) node).demote();
-                ((AVLNode) node).updateSize();
-                ((AVLNode) node.getParent().getLeft()).demote();
-                ((AVLNode) node.getParent().getLeft()).updateSize();
-                ((AVLNode) node.getParent()).promote();
-                ((AVLNode) node.getParent()).updateSize();
+                }
+                if (((AVLNode) node).whatCaseInsert() == 32) {
+//                    System.out.println("case 3 RL for key = " + node.getKey());
+                    ((AVLNode) node.getLeft()).rotateRightLeft();
+                    ((AVLNode) node).demote();
+                    ((AVLNode) node).updateSize();
+                    ((AVLNode) node.getParent().getLeft()).demote();
+                    ((AVLNode) node.getParent().getLeft()).updateSize();
+                    ((AVLNode) node.getParent()).promote();
+                    ((AVLNode) node.getParent()).updateSize();
+                }
+                if (node.getParent() == root) {
+                    ((AVLNode) node.getParent()).updateSize();
+                }
+                if (node.getParent() == null) {
+                    break;
+                }
             }
         }
 
@@ -726,6 +772,11 @@ public class AVLTree {
         }
 
         public void updateSize() {
+//            System.out.println("updateSize with key = " + getKey());
+            if (!isRealNode()) {
+                setSize(0);
+                return;
+            }
             int sizeLeft = left.getSize();
             int sizeRight = right.getSize();
             setSize(sizeLeft + sizeRight + 1);
@@ -812,21 +863,13 @@ public class AVLTree {
             return y;
         }
 
-//        public int sizeNode() {
-//            if (!isRealNode()) {
-//                return 0;
-//            } else {
-//                return 1 + left.sizeNode() + right.sizeNode();
-//            }
-//        }
-
         public int sizeNode() {
             return size;
         }
 
         public AVLNode searchNode(int k) {
             if (!isRealNode()) {
-                return this;
+                return null;
             }
             if (key == k) {
                 return this;
@@ -853,35 +896,50 @@ public class AVLTree {
 //        System.out.println("root.right = " + tree.getRoot().getRight().getKey());
 
 
-        tree.insert(8,"");
-        tree.insert(24,"");
-        tree.insert(4,"");
-        tree.insert(7,"");
-        tree.insert(36,"");
-        tree.insert(16,"");
-        tree.insert(2,"");
-        tree.insert(1,"");
-        tree.insert(5,"");
-        tree.insert(13,"");
-        tree.insert(35,"");
+//        tree.insert(8, "");
+        tree.insert(24, "");
+//        tree.insert(4, "");
+//        tree.insert(7, "");
+//        tree.insert(12, "");
+//        tree.insert(30, "");
+//        tree.insert(-9, "");
+//        tree.insert(36, "");
+//        tree.insert(28, "");
+//        tree.insert(26, "");
+//        tree.insert(10, "");
+//        tree.insert(9, "");
+        System.out.println("root = " + tree.getRoot().getKey());
+        System.out.println("tree height = " + tree.getRoot().getHeight());
+        System.out.println("tree size = " + tree.size());
+        tree.delete(24);
+        System.out.println("root = " + tree.getRoot().getKey());
+        System.out.println("tree height = " + tree.getRoot().getHeight());
+        System.out.println("tree size = " + tree.size());
+//        tree.delete(36);
+//        tree.insert(16, "");
+//        tree.insert(2, "");
+//        tree.insert(1, "");
+//        tree.insert(5, "");
+//        tree.insert(13, "");
+//        tree.insert(35, "");
 //        ((AVLNode)tree.getRoot()).updateSize();
 //        tree.insert(4,"");
 //        tree.insert(9,"");
 //
 //        int[] keys = tree.keysToArray();
 //        System.out.println(Arrays.toString(keys));
-        System.out.println("root = " + tree.getRoot().getKey() + " size= " +
-                ((AVLNode) tree.getRoot()).getSize() + " height = " + tree.getRoot().getHeight());
-        System.out.println("root.left = " + tree.getRoot().getLeft().getKey() + " size= " + ((AVLNode) tree.getRoot().getLeft()).getSize()
-                + " height = " + tree.getRoot().getLeft().getHeight());
-        System.out.println("root.right = " + tree.getRoot().getRight().getKey() + " size= " + ((AVLNode) tree.getRoot().getRight()).getSize()
-                + " height = " + tree.getRoot().getRight().getHeight());
-        System.out.println("root.left.left = " + tree.getRoot().getLeft().getLeft().getKey() + " size= " + ((AVLNode) tree.getRoot().getLeft().getLeft()).getSize()+
-                " height = "
-                + tree.getRoot().getLeft().getLeft().getHeight());
-        System.out.println("root.left.right = " + tree.getRoot().getLeft().getRight().getKey() + " size= " + ((AVLNode) tree.getRoot().getLeft().getRight()).getSize()+ "" +
-                " height = "
-                + tree.getRoot().getLeft().getRight().getHeight());
+//        System.out.println("root = " + tree.getRoot().getKey() + " size= " +
+//                ((AVLNode) tree.getRoot()).getSize() + " height = " + tree.getRoot().getHeight());
+//        System.out.println("root.left = " + tree.getRoot().getLeft().getKey() + " size= " + ((AVLNode) tree.getRoot().getLeft()).getSize()
+//                + " height = " + tree.getRoot().getLeft().getHeight());
+//        System.out.println("root.right = " + tree.getRoot().getRight().getKey() + " size= " + ((AVLNode) tree.getRoot().getRight()).getSize()
+//                + " height = " + tree.getRoot().getRight().getHeight());
+//        System.out.println("root.left.left = " + tree.getRoot().getLeft().getLeft().getKey() + " size= " + ((AVLNode) tree.getRoot().getLeft().getLeft()).getSize() +
+//                " height = "
+//                + tree.getRoot().getLeft().getLeft().getHeight());
+//        System.out.println("root.left.right = " + tree.getRoot().getLeft().getRight().getKey() + " size= " + ((AVLNode) tree.getRoot().getLeft().getRight()).getSize() + "" +
+//                " height = "
+//                + tree.getRoot().getLeft().getRight().getHeight());
 //        System.out.println(tree.getRoot().getParent());
 //        System.out.println("root.right.right = " + tree.getRoot().getRight().getRight().getKey() + " size= " + ((AVLNode) tree.getRoot().getRight().getRight()).getSize());
 //        System.out.println("root.right.left = " + tree.getRoot().getRight().getLeft().getKey() + " size= " + ((AVLNode) tree.getRoot().getRight().getLeft()).getSize());
