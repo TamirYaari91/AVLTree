@@ -885,15 +885,6 @@ public class AVLTree {
 
     public static void main(String[] args) {
         AVLTree tree = new AVLTree();
-//        tree.insert(1, "one");
-//        tree.insert(2, "two");
-//        tree.insert(3, "three");
-//        tree.delete(2);
-//        int[] keys = tree.keysToArray();
-//        System.out.println(Arrays.toString(keys));
-//        System.out.println("root = " + tree.getRoot().getKey() + " ");
-//        System.out.println("root.left = " + tree.getRoot().getLeft().getKey());
-//        System.out.println("root.right = " + tree.getRoot().getRight().getKey());
 
 
 //        tree.insert(8, "");
