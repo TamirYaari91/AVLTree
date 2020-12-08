@@ -6,10 +6,6 @@
  * distinct integer keys and info
  */
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 public class AVLTree {
 
     IAVLNode root;
@@ -45,7 +41,11 @@ public class AVLTree {
             return null;
         }
         IAVLNode root = getRoot();
-        return ((AVLNode) root).searchNode(k).getValue();
+        IAVLNode node = ((AVLNode) root).searchNode(k);
+        if (node == null) {
+            return null;
+        }
+        return (node.getValue());
     }
 
     /**
@@ -182,7 +182,7 @@ public class AVLTree {
             }
         } else {
             ((AVLNode) successor.getRight()).rebalancingDelete();
-            ((AVLNode) successor).rebalancingDelete();
+            //((AVLNode) successor).rebalancingDelete();
         }
         size = ((AVLNode) getRoot()).getSize();
         return 42;    // to be replaced by student code
@@ -315,6 +315,10 @@ public class AVLTree {
         return 0;
     }
 
+    protected boolean testRemove() {
+        return false;
+    }
+
 
     /**
      * public interface IAVLNode
@@ -355,7 +359,7 @@ public class AVLTree {
      */
     public class AVLNode implements IAVLNode {
 
-        String info;
+        String info = null;
         int key = -1;
         AVLNode left = null;
         AVLNode right = null;
@@ -829,7 +833,10 @@ public class AVLTree {
 
         public AVLNode nodeMax() {
             AVLNode node = right;
-            while (right.isRealNode()) {
+            if (!right.isRealNode()) { //added this
+                return this;
+            }
+            while (node.right.isRealNode()) {
                 node = node.right;
             }
             return node;
