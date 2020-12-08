@@ -1,3 +1,4 @@
+import java.awt.print.Printable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -121,51 +122,109 @@ public class printableTree extends AVLTree {
     public static void main(String[] args) {
         AVLTree tree = new printableTree();
         tree.insert(24, "");
-
         tree.insert(8, "");
-        tree.insert(4, "");
+        tree.insert(6, "");
         tree.insert(7, "");
         tree.insert(12, "");
         tree.insert(30, "");
-        tree.insert(1, "");
+        tree.insert(5, "");
         tree.insert(36, "");
         tree.insert(28, "");
         tree.insert(26, "");
         tree.insert(10, "");
         tree.insert(9, "");
         ((printableTree)tree).printTree();
-        System.out.println("tree height = "+tree.getRoot().getHeight());
-        System.out.println("tree size = "+((AVLNode)tree.getRoot()).getSize());
-        System.out.println(Arrays.toString(tree.keysToArray()));
-        System.out.println("-------------------");
-        System.out.println("deleting node 9:");
-        tree.delete(9);
-        ((printableTree)tree).printTree();
-        System.out.println("tree height = "+tree.getRoot().getHeight());
-        System.out.println("tree size = "+((AVLNode)tree.getRoot()).getSize());
-        System.out.println(Arrays.toString(tree.keysToArray()));
-        System.out.println("-------------------");
-        System.out.println("deleting node 24:");
-        tree.delete(24);
-        ((printableTree)tree).printTree();
-        System.out.println("tree height = "+tree.getRoot().getHeight());
-        System.out.println("tree size = "+((AVLNode)tree.getRoot()).getSize());
-        System.out.println(Arrays.toString(tree.keysToArray()));
-        System.out.println("-------------------");
-        System.out.println("deleting node 10:");
-        tree.delete(10);
-        ((printableTree)tree).printTree();
-        System.out.println("tree height = "+tree.getRoot().getHeight());
-        System.out.println("tree size = "+((AVLNode)tree.getRoot()).getSize());
-        System.out.println(Arrays.toString(tree.keysToArray()));
-        System.out.println("-------------------");
-        System.out.println("deleting node 8:");
-        tree.delete(8);
-        ((printableTree)tree).printTree();
-        System.out.println("tree height = "+tree.getRoot().getHeight());
-        System.out.println("tree size = "+((AVLNode)tree.getRoot()).getSize());
-        System.out.println(Arrays.toString(tree.keysToArray()));
-        System.out.println("-------------------");
+        System.out.println("-------------------------");
+        AVLTree[] splitted = (tree.split(8));
+
+//        System.out.println(splitted[0].getRoot().getLeft().getKey());
+        System.out.println("large tree:");
+        System.out.println(splitted[0].getRoot().getKey());
+        System.out.println(splitted[0].getRoot().getLeft().getKey());
+        System.out.println(splitted[0].getRoot().getLeft().getLeft().getKey());
+        System.out.println(splitted[0].getRoot().getRight().getKey());
+        System.out.println(splitted[0].getRoot().getRight().getRight().getKey());
+        System.out.println("min = " + splitted[0].min.getKey());
+        System.out.println("max = " + splitted[0].max.getKey());
+        System.out.println("size = " + ((AVLNode)splitted[0].getRoot()).getSize());
+        System.out.println("height = " + splitted[0].getRoot().getHeight());
+
+        System.out.println("-------------------------");
+        System.out.println("large tree:");
+        System.out.println(splitted[1].getRoot().getKey());
+        System.out.println(splitted[1].getRoot().getLeft().getKey());
+        System.out.println(splitted[1].getRoot().getLeft().getLeft().getKey());
+        System.out.println(splitted[1].getRoot().getRight().getKey());
+        System.out.println(splitted[1].getRoot().getRight().getRight().getKey());
+        System.out.println("min = " + splitted[1].min.getKey());
+        System.out.println("max = " + splitted[1].max.getKey());
+        System.out.println("size = " + ((AVLNode)splitted[1].getRoot()).getSize());
+        System.out.println("height = " + splitted[1].getRoot().getHeight());
+
+
+
+
+//        System.out.println(splitted[0].getRoot().getRight().getKey());
+//        System.out.println(splitted[0].getRoot().getRight().getRight().getKey());
+//        System.out.println(splitted[0].getRoot().getRight().getLeft().getKey());
+        System.out.println("-------------------------");
+//        System.out.println(splitted[1].getRoot().getLeft().getKey());
+//        printableTree split1 = splitted[0];
+//        AVLTree t = new printableTree();
+//        t.insert(111, "");
+//        t.insert( 222, "");
+//        t.insert( 200, "");
+//        t.insert( 2222, "");
+
+
+//
+//        AVLTree oneNode = new printableTree();
+//        AVLTree empty = new printableTree();
+//        ((printableTree)empty).printTree();
+
+//        oneNode.insert(100,"");
+//        oneNode.insert(39,"");
+//        IAVLNode x = oneNode.getRoot();
+//        IAVLNode x = oneNode.getRoot().getRight();
+//        empty.join(x,t);
+
+
+//        ((printableTree)empty).printTree();
+//        System.out.println(((AVLNode)tree.getRoot()).getSize());
+//        System.out.println(empty.size());
+//        System.out.println(empty.max.getKey());
+//        System.out.println("tree height = "+tree.getRoot().getHeight());
+//        System.out.println("tree size = "+((AVLNode)tree.getRoot()).getSize());
+//        System.out.println(Arrays.toString(tree.keysToArray()));
+//        System.out.println("-------------------");
+//        System.out.println("deleting node 9:");
+//        tree.delete(9);
+//        ((printableTree)tree).printTree();
+//        System.out.println("tree height = "+tree.getRoot().getHeight());
+//        System.out.println("tree size = "+((AVLNode)tree.getRoot()).getSize());
+//        System.out.println(Arrays.toString(tree.keysToArray()));
+//        System.out.println("-------------------");
+//        System.out.println("deleting node 24:");
+//        tree.delete(24);
+//        ((printableTree)tree).printTree();
+//        System.out.println("tree height = "+tree.getRoot().getHeight());
+//        System.out.println("tree size = "+((AVLNode)tree.getRoot()).getSize());
+//        System.out.println(Arrays.toString(tree.keysToArray()));
+//        System.out.println("-------------------");
+//        System.out.println("deleting node 10:");
+//        tree.delete(10);
+//        ((printableTree)tree).printTree();
+//        System.out.println("tree height = "+tree.getRoot().getHeight());
+//        System.out.println("tree size = "+((AVLNode)tree.getRoot()).getSize());
+//        System.out.println(Arrays.toString(tree.keysToArray()));
+//        System.out.println("-------------------");
+//        System.out.println("deleting node 8:");
+//        tree.delete(8);
+//        ((printableTree)tree).printTree();
+//        System.out.println("tree height = "+tree.getRoot().getHeight());
+//        System.out.println("tree size = "+((AVLNode)tree.getRoot()).getSize());
+//        System.out.println(Arrays.toString(tree.keysToArray()));
+//        System.out.println("-------------------");
 
 //        tree.delete(8);
 //        ((printableTree)tree).printTree();
