@@ -12,7 +12,8 @@ public class AVLTree {
     IAVLNode min;
     IAVLNode max;
 
-    private static int counter;
+    private static int counterBinary;
+    private static int counterFinger;
 
     public AVLTree() {
         root = new AVLNode();
@@ -86,7 +87,6 @@ public class AVLTree {
             }
         }
         IAVLNode node = new AVLNode(k, i);
-        int res;
         if (!root.isRealNode()) {
             root = node;
             min = node;
@@ -106,8 +106,13 @@ public class AVLTree {
                 if (!root.getLeft().isRealNode()) {
                     root.setLeft(node);
                     ((AVLNode) node).rebalancingInsert();
-                    res = counter;
-                    counter = 0;
+                    if (fingerSearch) {
+                        int res = counterFinger;
+                        counterFinger = 0;
+                        return res;
+                    }
+                    int res = counterBinary;
+                    counterBinary = 0;
                     return res;
                 }
                 root = root.getLeft();
@@ -115,15 +120,25 @@ public class AVLTree {
                 if (!root.getRight().isRealNode()) {
                     root.setRight(node);
                     ((AVLNode) node).rebalancingInsert();
-                    res = counter;
-                    counter = 0;
+                    if (fingerSearch) {
+                        int res = counterFinger;
+                        counterFinger = 0;
+                        return res;
+                    }
+                    int res = counterBinary;
+                    counterBinary = 0;
                     return res;
                 }
                 root = root.getRight();
             }
         }
-        res = counter;
-        counter = 0;
+        if (fingerSearch) {
+            int res = counterFinger;
+            counterFinger = 0;
+            return res;
+        }
+        int res = counterBinary;
+        counterBinary = 0;
         return res;
     }
 
@@ -150,7 +165,6 @@ public class AVLTree {
             max = null;
             return 0;
         }
-        int res;
         if (min.getKey() == k) {
             min = ((AVLNode) min).Successor();
         }
@@ -165,8 +179,8 @@ public class AVLTree {
                 parent.setRight(new AVLNode());
             }
             ((AVLNode) parent).rebalancingDelete();
-            res = counter;
-            counter = 0;
+            int res = counterBinary;
+            counterBinary = 0;
             return res;
         }
         if (((AVLNode) toDelete).getSize() == 2) { //deleting a unary node
@@ -174,8 +188,8 @@ public class AVLTree {
             if (parent != null) {
                 ((AVLNode) parent).rebalancingDelete();
             }
-            res = counter;
-            counter = 0;
+            int res = counterBinary;
+            counterBinary = 0;
             return res;
         }
         IAVLNode successor = ((AVLNode) toDelete).Successor();
@@ -215,8 +229,8 @@ public class AVLTree {
             ((AVLNode) successor.getRight()).rebalancingDelete();
             //((AVLNode) successor).rebalancingDelete();
         }
-        res = counter;
-        counter = 0;
+        int res = counterBinary;
+        counterBinary = 0;
         return res;
     }
 
@@ -601,7 +615,7 @@ public class AVLTree {
                 }
             }
             parent.setLeft(rightChild);
-            counter++;
+            counterBinary++;
         }
 
         public void rotateLeft() {
@@ -622,19 +636,19 @@ public class AVLTree {
                 }
             }
             parent.setRight(leftChild);
-            counter++;
+            counterBinary++;
         }
 
         public void demote() {
             int rank = getHeight();
             setHeight(rank - 1);
-            counter++;
+            counterBinary++;
         }
 
         public void promote() {
             int rank = getHeight();
             setHeight(rank + 1);
-            counter++;
+            counterBinary++;
         }
 
         public void rotateLeftRight() {
@@ -996,7 +1010,7 @@ public class AVLTree {
             int heightLeft = left.getHeight();
             int heightRight = right.getHeight();
             setHeight(Math.max(heightLeft, heightRight) + 1);
-            counter++; // ???
+            counterBinary++; // ???
         }
 
         public void updateSize() {
@@ -1100,14 +1114,17 @@ public class AVLTree {
 
         public AVLNode searchNode(int k) {
             if (!isRealNode()) {
+                counterBinary--;
                 return null;
             }
             if (key == k) {
                 return this;
             } else {
                 if (key > k) {
+                    counterBinary++;
                     return left.searchNode(k);
                 } else {
+                    counterBinary++;
                     return right.searchNode(k);
                 }
             }
@@ -1123,6 +1140,7 @@ public class AVLTree {
             }
             while (k < node.getKey() && node.getParent() != null) {
                 node = node.getParent();
+                counterFinger++;
             }
             return ((AVLNode)node).searchNode(k);
 
