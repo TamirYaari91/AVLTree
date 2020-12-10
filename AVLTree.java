@@ -49,6 +49,18 @@ public class AVLTree {
         return (node.getValue());
     }
 
+    public String searchFinger(int k) {
+        if (empty()) {
+            return null;
+        }
+        IAVLNode root = max;
+        IAVLNode node = ((AVLNode) root).searchNodeFinger(k);
+        if (node == null) {
+            return null;
+        }
+        return (node.getValue());
+    }
+
     /**
      * public int insert(int k, String i)
      * <p>
@@ -58,9 +70,20 @@ public class AVLTree {
      * promotion/rotation - counted as one rebalance operation, double-rotation is counted as 2.
      * returns -1 if an item with key k already exists in the tree.
      */
+
     public int insert(int k, String i) {
-        if (search(k) != null) {
-            return -1;
+        return insert(k,i,false);
+    }
+
+    public int insert(int k, String i, boolean fingerSearch) {
+        if (fingerSearch) {
+            if (searchFinger(k) != null) {
+                return -1;
+            }
+        } else {
+            if (search(k) != null) {
+                return -1;
+            }
         }
         IAVLNode node = new AVLNode(k, i);
         int res;
@@ -1090,7 +1113,24 @@ public class AVLTree {
             }
         }
 
+        public AVLNode searchNodeFinger(int k) {
+            IAVLNode node = max;
+            if (k > max.getKey() || max == null) {
+                return null;
+            }
+            if (k == max.getKey()) {
+                return this;
+            }
+            while (k < node.getKey() && node.getParent() != null) {
+                node = node.getParent();
+            }
+            return ((AVLNode)node).searchNode(k);
+
+        }
+
     }
+
+
 
     public static void main(String[] args) {
     }
