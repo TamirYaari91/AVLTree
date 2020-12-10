@@ -167,7 +167,7 @@ public class AVLTree {
         }
         ((AVLNode) successor.getLeft()).updateSize();
         ((AVLNode) successor.getRight()).updateSize();
-        ((AVLNode) successor).setHeightAfterInsert(); //should this be added to counter?
+        ((AVLNode) successor).setHeightAfterInsert();
         ((AVLNode) successor).updateSize();
         if (toDelete == root) {
             root = successor;
@@ -183,7 +183,7 @@ public class AVLTree {
         if (toDelete.getParent() != null) {
             if (successorParent == toDelete) {
                 successor.setParent(toDelete.getParent());
-                ((AVLNode) successor).setHeightAfterInsert(); //should this be added to counter?
+                ((AVLNode) successor).setHeightAfterInsert();
                 ((AVLNode) successor).rebalancingDelete();
             } else {
                 ((AVLNode) successorParent).rebalancingDelete();
@@ -443,7 +443,7 @@ public class AVLTree {
             }
             root = x;
             ((AVLNode) getRoot()).updateSize();
-            ((AVLNode) getRoot()).setHeightAfterInsert(); //should this be added to counter?
+            ((AVLNode) getRoot()).setHeightAfterInsert();
         }
         return complexity;
     }
@@ -460,7 +460,7 @@ public class AVLTree {
         x.setRight(b);
         x.setParent(c);
         c.setLeft(x);
-        ((AVLNode) x).setHeightAfterInsert(); //should this be added to counter?
+        ((AVLNode) x).setHeightAfterInsert();
         ((AVLNode) x).updateSize();
         ((AVLNode) x).rebalancingInsert();
     }
@@ -477,12 +477,12 @@ public class AVLTree {
         x.setLeft(a);
         x.setParent(d);
         d.setRight(x);
-        ((AVLNode) x).setHeightAfterInsert(); //should this be added to counter?
+        ((AVLNode) x).setHeightAfterInsert();
         ((AVLNode) x).updateSize();
         ((AVLNode) x).rebalancingInsert();
     }
 
-    protected boolean testRemove() {
+    protected boolean testRemove() { // should this be deleted?
         return false;
     }
 
