@@ -29,32 +29,37 @@ public class measurements {
     }
 
     public static Integer[] buildRandomArray(int size) {
-        Integer[] arrInteger = new Integer[size*10000];
+        Integer[] arrInteger = new Integer[size];
+
         for (int i = 0; i < arrInteger.length; i++) {
             arrInteger[i] = i;
         }
         List<Integer> intList = Arrays.asList(arrInteger);
         Collections.shuffle(intList);
         intList.toArray(arrInteger);
-        System.out.println(Arrays.toString(arrInteger));
         return arrInteger;
     }
 
     public static int AVLInsertionCosts (Integer[] arr) {
         AVLTree tree = new AVLTree();
+//        AVLTree tree = new printableTree();
         int[] searchCosts = new int[arr.length];
         for (int i = 0; i < arr.length; i++) {
-            int cost = tree.insert(i,String.valueOf(i));
+            int cost = tree.insert(arr[i],String.valueOf(arr[i]),true);
+//            ((printableTree) tree).printTree();
+//            System.out.println("----------------");
             searchCosts[i] = cost;
         }
-        System.out.println(Arrays.toString(searchCosts));
+//        System.out.println(Arrays.toString(searchCosts));
         return Arrays.stream(searchCosts).sum();
     }
 
     public static void main(String[] args) {
-        Integer[] randArr = buildRandomArray(1);
+        Integer[] randArr = buildRandomArray(10000);
+        Integer[] randArrCopy = randArr.clone();
+//        System.out.println("randArr = "+Arrays.toString(randArr));
         int insertionSortCost = insertionSort(randArr);
-        int AVLCost = AVLInsertionCosts(randArr);
+        int AVLCost = AVLInsertionCosts(randArrCopy);
         System.out.println("insertionSort Cost = "+insertionSortCost);
         System.out.println("AVL Cost = "+AVLCost);
 

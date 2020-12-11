@@ -616,6 +616,7 @@ public class AVLTree {
             }
             parent.setLeft(rightChild);
             counterBinary++;
+//            System.out.println("rotateRight with key = "+getKey());
         }
 
         public void rotateLeft() {
@@ -637,18 +638,23 @@ public class AVLTree {
             }
             parent.setRight(leftChild);
             counterBinary++;
+//            System.out.println("rotateLeft with key = "+getKey());
+
         }
 
         public void demote() {
             int rank = getHeight();
             setHeight(rank - 1);
             counterBinary++;
+//            System.out.println("demote with key = "+getKey());
+
         }
 
         public void promote() {
             int rank = getHeight();
             setHeight(rank + 1);
             counterBinary++;
+//            System.out.println("promote with key = "+getKey());
         }
 
         public void rotateLeftRight() {
@@ -1011,6 +1017,7 @@ public class AVLTree {
             int heightRight = right.getHeight();
             setHeight(Math.max(heightLeft, heightRight) + 1);
             counterBinary++; // ???
+//            System.out.println("setHeight with key = "+getKey());
         }
 
         public void updateSize() {
@@ -1114,17 +1121,19 @@ public class AVLTree {
 
         public AVLNode searchNode(int k) {
             if (!isRealNode()) {
-                counterBinary--;
+                counterFinger--;
                 return null;
             }
             if (key == k) {
                 return this;
             } else {
                 if (key > k) {
-                    counterBinary++;
+                    counterFinger++;
+//                    System.out.println("counterFinger = "+counterFinger);
                     return left.searchNode(k);
                 } else {
-                    counterBinary++;
+                    counterFinger++;
+//                    System.out.println("counterFinger = "+counterFinger);
                     return right.searchNode(k);
                 }
             }
@@ -1141,6 +1150,7 @@ public class AVLTree {
             while (k < node.getKey() && node.getParent() != null) {
                 node = node.getParent();
                 counterFinger++;
+//                System.out.println("counterFinger = "+counterFinger);
             }
             return ((AVLNode)node).searchNode(k);
 
