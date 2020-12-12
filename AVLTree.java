@@ -1,10 +1,11 @@
-
 /**
  * AVLTree
  * <p>
  * An implementation of a AVL Tree with
  * distinct integer keys and info
  */
+
+import java.util.ArrayList;
 
 public class AVLTree {
 
@@ -14,6 +15,8 @@ public class AVLTree {
 
     private static int counterBinary;
     private static int counterFinger;
+    private static int counterJoins;
+    private static ArrayList<Integer> joinCosts;
 
     public AVLTree() {
         root = new AVLNode();
@@ -354,6 +357,8 @@ public class AVLTree {
      */
 
     public AVLTree[] split(int x) {
+        counterJoins = 0;
+        joinCosts = new ArrayList<>();
         IAVLNode node = ((AVLNode) getRoot()).searchNode(x);
         IAVLNode nextCurr = this.getRoot();
         AVLTree leftTree = new AVLTree();
@@ -482,6 +487,8 @@ public class AVLTree {
             ((AVLNode) getRoot()).updateSize();
             ((AVLNode) getRoot()).setHeightAfterInsert();
         }
+        counterJoins++;
+        joinCosts.add(complexity);
         return complexity;
     }
 
@@ -1154,6 +1161,14 @@ public class AVLTree {
             }
             return ((AVLNode)node).searchNode(k);
 
+        }
+
+        public int maxNodeInLeftTree() {
+            IAVLNode node = getLeft();
+            while (node.getRight().isRealNode()) {
+                node = node.getRight();
+            }
+            return node.getKey();
         }
 
     }
