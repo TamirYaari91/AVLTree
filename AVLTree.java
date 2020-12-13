@@ -15,8 +15,8 @@ public class AVLTree {
 
     private static int counterBinary;
     private static int counterFinger;
-    private static int counterJoins;
-    private static ArrayList<Integer> joinCosts;
+    public static int counterJoins;
+    public static ArrayList<Integer> joinCosts;
 
     public AVLTree() {
         root = new AVLNode();
@@ -493,6 +493,7 @@ public class AVLTree {
         }
         counterJoins++;
         joinCosts.add(complexity);
+
         return complexity;
     }
 
@@ -501,6 +502,9 @@ public class AVLTree {
         IAVLNode b = t.getRoot();
         while (b.getHeight() > thisRank) {
 //            System.out.println("joinLeft while");
+            if (b.isRealNode() && b.getLeft().getParent() != b) {
+                b.getLeft().setParent(b);
+            }
             b = b.getLeft();
         }
         IAVLNode c = b.getParent();
@@ -518,6 +522,9 @@ public class AVLTree {
         IAVLNode a = t.getRoot();
         while (a.getHeight() > thisRank) {
 //            System.out.println("joinRight while");
+            if (a.isRealNode() && a.getRight().getParent() != a) {
+                a.getRight().setParent(a);
+            }
             a = a.getRight();
         }
         IAVLNode d = a.getParent();

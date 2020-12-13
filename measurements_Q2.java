@@ -21,12 +21,15 @@ public class measurements_Q2 {
     public static void main(String[] args) {
         AVLTree tree = new printableTree();
         int[] randArr = buildRandomArrayUnbounded(10);
+        System.out.println(Arrays.toString(randArr));
+        System.out.println("---------");
         for (int num: randArr) {
             tree.insert(num,String.valueOf(num));
         }
         ((printableTree) tree).printTree();
         System.out.println("---------");
         int splitVal = getRandomElementFromArray(randArr);
+
         System.out.println("split by = "+splitVal);
         System.out.println("---------");
         AVLTree[] split = tree.split(splitVal);
@@ -42,7 +45,10 @@ public class measurements_Q2 {
         System.out.println("---------");
         ((printableTree) treeSplit1).printTree();
         System.out.println("---------");
-//        System.out.println("joinCosts = "+ AVLTree.joinCosts.toString());
+        System.out.println("joinCosts = "+ AVLTree.joinCosts.toString());
+        System.out.println(((AVLTree.AVLNode)treeSplit0.getRoot()).getSize());
+        System.out.println(((AVLTree.AVLNode)treeSplit1.getRoot()).getSize());
+
 
 
     }
