@@ -456,7 +456,11 @@ public class AVLTree {
                     max = t.max;
                 }
             }
-            root = t.getRoot();
+            IAVLNode tRoot = t.getRoot();
+            while (tRoot.getParent() != null) {
+                tRoot = tRoot.getParent();
+            }
+            root = tRoot;
         } else if (treeRank > otherRank) {
             if (otherRank == -1) {
                 this.insert(x.getKey(), x.getValue());
@@ -610,7 +614,7 @@ public class AVLTree {
             IAVLNode rightChild = getRight();
 
             setRight(parent);
-            if (getRoot().getKey() == parent.getKey()) {
+            if (getRoot().getKey() == parent.getKey() || grandpa == null) {
                 root = this;
                 setParent(grandpa);
             } else {
@@ -632,7 +636,7 @@ public class AVLTree {
             IAVLNode leftChild = getLeft();
 
             setLeft(parent);
-            if (getRoot().getKey() == parent.getKey()) {
+            if (getRoot().getKey() == parent.getKey() || grandpa == null) { // how does this cause losing 3 and 50
                 root = this;
                 setParent(grandpa);
             } else {

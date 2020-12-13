@@ -158,7 +158,9 @@ public class printableTree extends AVLTree {
         ((printableTree) treeSplit0).printTree();
         System.out.println("---------");
         ((printableTree) treeSplit1).printTree();
-
+        System.out.println("---------");
+        System.out.println(((AVLNode)treeSplit0.getRoot()).getSize());
+        System.out.println(((AVLNode)treeSplit1.getRoot()).getSize());
 //        System.out.println(Arrays.toString(tree.keysToArray()));
 //        System.out.println(Arrays.toString(tree.infoToArray()));
 //        System.out.println("min is "+tree.min());
