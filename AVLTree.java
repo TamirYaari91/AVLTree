@@ -251,11 +251,11 @@ public class AVLTree {
         return min.getValue();
     }
 
-    public IAVLNode getNewMin() {
-        IAVLNode root = getRoot();
-        IAVLNode minNode = ((AVLNode) root).nodeMin();
-        return minNode;
-    }
+//    public IAVLNode getNewMin() {
+//        IAVLNode root = getRoot();
+//        IAVLNode minNode = ((AVLNode) root).nodeMin();
+//        return minNode;
+//    }
 
     /**
      * public String max()
@@ -440,7 +440,11 @@ public class AVLTree {
      */
     public int join(IAVLNode x, AVLTree t) {
         int treeRank = getRoot().getHeight();
+//        System.out.println("treeRoot = "+getRoot().getKey());
+//        System.out.println("treeRank = "+treeRank);
         int otherRank = t.getRoot().getHeight();
+//        System.out.println("otherRoot = "+t.getRoot().getKey());
+//        System.out.println("otherRank = "+otherRank);
         int complexity = Math.abs(this.getRoot().getHeight() - t.getRoot().getHeight()) + 1;
         if (treeRank < otherRank) {
             if (treeRank == -1) {
@@ -537,9 +541,6 @@ public class AVLTree {
         ((AVLNode) x).rebalancingInsert();
     }
 
-    protected boolean testRemove() { // should this be deleted?
-        return false;
-    }
 
 
     /**
@@ -1132,10 +1133,6 @@ public class AVLTree {
             }
             return y;
         }
-//
-//        public int getSize() {
-//            return size;
-//        }
 
         public AVLNode searchNode(int k) {
             if (!isRealNode()) {
@@ -1183,8 +1180,6 @@ public class AVLTree {
         }
 
     }
-
-
 
     public static void main(String[] args) {
     }

@@ -63,7 +63,7 @@ public class measurements_Q1 {
     }
 
     public static void main(String[] args) {
-        Integer[] randArr = buildRandomArray(1000);
+        Integer[] randArr = buildRandomArray(100000);
         Integer[] randArrCopy = randArr.clone();
         long insertionSortCost = insertionSort(randArr);
         int AVLCost = AVLInsertionCosts(randArrCopy);
