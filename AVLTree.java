@@ -13,10 +13,10 @@ public class AVLTree {
     IAVLNode min;
     IAVLNode max;
 
-    private static int counterBinary;
-    private static int counterFinger;
-    public static int counterJoins;
-    public static ArrayList<Integer> joinCosts;
+    public static int counterBinary; // counts balancing operations
+    public static int counterFinger; // counts edges traveled during finger search for measurements Q1
+    public static int counterJoins; // counts number of join operations for measurements Q2
+    public static ArrayList<Integer> joinCosts; // stores cost of each join operation for a specific split
 
     public AVLTree() {
         root = new AVLNode();
@@ -31,7 +31,7 @@ public class AVLTree {
      * returns true if and only if the tree is empty
      */
     public boolean empty() {
-        return !root.isRealNode();// to be replaced by student code
+        return !root.isRealNode();
 
     }
 
@@ -42,24 +42,24 @@ public class AVLTree {
      * otherwise, returns null
      */
     public String search(int k) {
-        if (empty()) {
+        if (empty()) { // tree is empty
             return null;
         }
         IAVLNode root = getRoot();
-        IAVLNode node = ((AVLNode) root).searchNode(k);
-        if (node == null) {
+        IAVLNode node = ((AVLNode) root).searchNode(k); // perform binary search
+        if (node == null) { // node not found
             return null;
         }
         return (node.getValue());
     }
 
     public String searchFinger(int k) {
-        if (empty()) {
+        if (empty()) { // tree is empty
             return null;
         }
-        IAVLNode root = max;
-        IAVLNode node = ((AVLNode) root).searchNodeFinger(k);
-        if (node == null) {
+        IAVLNode root = max; // start from max node
+        IAVLNode node = ((AVLNode) root).searchNodeFinger(k); // perform finger search
+        if (node == null) { // node not found
             return null;
         }
         return (node.getValue());
@@ -82,40 +82,40 @@ public class AVLTree {
     public int insert(int k, String i, boolean fingerSearch) {
         if (fingerSearch) {
             if (searchFinger(k) != null) {
-                return -1;
+                return -1; // node k already in tree
             }
         } else {
             if (search(k) != null) {
-                return -1;
+                return -1; // node k already in tree
             }
         }
         IAVLNode node = new AVLNode(k, i);
-        if (!root.isRealNode()) {
+        if (!root.isRealNode()) { // node k is inserted to an empty tree
             root = node;
             min = node;
             max = node;
             root.setHeight(0);
             return 0;
         }
-        if (node.getKey() < min.getKey()) {
+        if (node.getKey() < min.getKey()) { // node k is the new minimum
             min = node;
         }
-        if (node.getKey() > max.getKey()) {
+        if (node.getKey() > max.getKey()) { // node k is the new maximum
             max = node;
         }
         IAVLNode root = getRoot();
-        while (node.getParent() == null) {
+        while (node.getParent() == null) { // performs binary search in order to determine where to place node
             if (node.getKey() < root.getKey()) {
                 if (!root.getLeft().isRealNode()) {
                     root.setLeft(node);
-                    node.rebalancingInsert();
+                    node.rebalancingInsert(); // after node is entered, relevant rebalancing function is called
                     if (fingerSearch) {
-                        int res = counterFinger;
+                        int res = counterFinger; // counter is nullified to be ready for next operation
                         counterFinger = 0;
                         return res;
                     }
                     int res = counterBinary;
-                    counterBinary = 0;
+                    counterBinary = 0; // counter is nullified to be ready for next operation
                     return res;
                 }
                 root = root.getLeft();
@@ -158,62 +158,62 @@ public class AVLTree {
 
     public int delete(int k) {
         IAVLNode node = this.root;
-        IAVLNode toDelete = ((AVLNode) node).searchNode(k);
-        if (toDelete == null) {
+        IAVLNode toDelete = ((AVLNode) node).searchNode(k); // finds node to be deleted using binary search
+        if (toDelete == null) { // node to be deleted wasn't found
             return -1;
         }
-        if (size() == 1) {
+        if (size() == 1) { // tree is consisted of 1 node only - creates a new empty tree instead
             root = new AVLNode();
             min = null;
             max = null;
             return 0;
         }
-        if (min.getKey() == k) {
+        if (min.getKey() == k) { // deleting the min node - new min is the successor of the current min
             min = min.Successor();
         }
-        if (max.getKey() == k) {
+        if (max.getKey() == k) { // deleting the max node - new max is the predecessor of the current max
             max = max.Predecessor();
         }
         IAVLNode parent = toDelete.getParent();
-        if (toDelete.getHeight() == 0) { //deleting a leaf
-            if (parent.getLeft() == toDelete) {
+        if (toDelete.getHeight() == 0) { // deleting a leaf
+            if (parent.getLeft() == toDelete) { // leaf is a left child
                 parent.setLeft(new AVLNode());
-            } else {
+            } else { // leaf is a right child
                 parent.setRight(new AVLNode());
             }
-            parent.rebalancingDelete();
+            parent.rebalancingDelete(); // after node is deleted, relevant rebalancing function is called
             int res = counterBinary;
             counterBinary = 0;
             return res;
         }
-        if (toDelete.getSize() == 2) { //deleting a unary node
+        if (toDelete.getSize() == 2) { // deleting an unary node
             toDelete.deleteUnary();
-            if (parent != null) {
+            if (parent != null) { // false -> tree is consisted of 2 nodes, no need of additional rebalancing
                 parent.rebalancingDelete();
             }
             int res = counterBinary;
-            counterBinary = 0;
+            counterBinary = 0; // counter is nullified to be ready for next operation
             return res;
-        }
-        IAVLNode successor = toDelete.Successor();
+        } // node to be deleted has 2 sons
+        IAVLNode successor = toDelete.Successor(); // successor is guaranteed to be an unary node
         IAVLNode successorParent = toDelete.Successor().getParent();
-        successor.deleteUnary();
+        successor.deleteUnary(); // removes successor from tree in order to place it instead of deleted node
         successor.setLeft(toDelete.getLeft());
-        successor.setRight(toDelete.getRight());
+        successor.setRight(toDelete.getRight()); // set successor's children to be the deleted node's children
         node = successorParent;
         while (node != successor.getLeft() && node != successor.getRight() && node != null) {
-            node.updateSize();
+            node.updateSize(); // going up the tree updating size, starting from previous parent of successor, up to successor
             node = node.getParent();
         }
         successor.getLeft().updateSize();
         successor.getRight().updateSize();
-        ((AVLNode) successor).setHeightAfterInsert();
+        ((AVLNode) successor).setHeightAfterInsert(); // update height of successor
         successor.updateSize();
-        if (toDelete == root) {
+        if (toDelete == root) { // if the deleted node was the root node, set successor to be the root
             root = successor;
             root.setParent(null);
         } else {
-            successor.setParent(toDelete.getParent());
+            successor.setParent(toDelete.getParent()); // establishes connection between successor and deleted node's parent so deleted node is removed from tree
             if (toDelete == toDelete.getParent().getLeft()) {
                 toDelete.getParent().setLeft(successor);
             } else {
@@ -226,10 +226,10 @@ public class AVLTree {
                 ((AVLNode) successor).setHeightAfterInsert();
                 successor.rebalancingDelete();
             } else {
-                successorParent.rebalancingDelete();
+                successorParent.rebalancingDelete(); // after node is deleted, relevant rebalancing function is called
             }
         } else {
-            successor.getRight().rebalancingDelete();
+            successor.getRight().rebalancingDelete(); // if deleted node was root, rebalancing starts from right child
         }
         int res = counterBinary;
         counterBinary = 0;
@@ -243,7 +243,7 @@ public class AVLTree {
      * or null if the tree is empty
      */
 
-    public String min() {
+    public String min() { // gets value of node with min pointer
         if (min == null) {
             return null;
         }
@@ -257,7 +257,7 @@ public class AVLTree {
      * or null if the tree is empty
      */
 
-    public String max() {
+    public String max() { // gets value of node with max pointer
         if (max == null) {
             return null;
         }
@@ -271,19 +271,19 @@ public class AVLTree {
      * Returns a sorted array which contains all keys in the tree,
      * or an empty array if the tree is empty.
      */
-    public int[] keysToArray() {
-        int[] arr = new int[size()]; // to be replaced by student code
+
+    public int[] keysToArray() { // performs in-order scan of the tree, adding each node's key to an array
+        int[] arr = new int[size()]; // array size is the size of the tree which is the size of the root
         if (arr.length == 0) {
             return arr;
         }
-        IAVLNode root = getRoot();
-        IAVLNode minNode = ((AVLNode) root).nodeMin();
+        IAVLNode minNode = min;
         arr[0] = minNode.getKey();
-        for (int i = 1; i < arr.length; i++) {
-            minNode = minNode.Successor();
+        for (int i = 1; i < arr.length; i++) { // scan starts with min node
+            minNode = minNode.Successor(); // afterwards, n-1 successor operations done
             arr[i] = minNode.getKey();
         }
-        return arr;              // to be replaced by student code
+        return arr;
     }
 
     /**
@@ -293,16 +293,15 @@ public class AVLTree {
      * sorted by their respective keys,
      * or an empty array if the tree is empty.
      */
-    public String[] infoToArray() {
-        String[] arr = new String[size()]; // to be replaced by student code
+    public String[] infoToArray() { // performs in-order scan of the tree, adding each node's value to an array
+        String[] arr = new String[size()]; // array size is the size of the tree which is the size of the root
         if (arr.length == 0) {
             return arr;
         }
-        IAVLNode root = getRoot();
-        IAVLNode minNode = ((AVLNode) root).nodeMin();
+        IAVLNode minNode = min; // scan starts with min node
         arr[0] = minNode.getValue();
         for (int i = 1; i < arr.length; i++) {
-            minNode = minNode.Successor();
+            minNode = minNode.Successor(); // afterwards, n-1 successor operations done
             arr[i] = minNode.getValue();
         }
         return arr;
@@ -316,9 +315,8 @@ public class AVLTree {
      * precondition: none
      * postcondition: none
      */
-    public int size() {
-        IAVLNode root = getRoot();
-        return root.getSize(); // to be replaced by student code
+    public int size() { // returns size of root
+        return getRoot().getSize();
     }
 
     /**
@@ -330,6 +328,9 @@ public class AVLTree {
      * postcondition: none
      */
     public IAVLNode getRoot() {
+        if (!root.isRealNode()) {
+            return null;
+        }
         return root;
     }
 
