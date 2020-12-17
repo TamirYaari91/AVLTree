@@ -328,9 +328,6 @@ public class AVLTree {
      * postcondition: none
      */
     public IAVLNode getRoot() {
-        if (!root.isRealNode()) {
-            return null;
-        }
         return root;
     }
 
@@ -346,19 +343,19 @@ public class AVLTree {
     public AVLTree[] split(int x) {
         counterJoins = 0;
         joinCosts = new ArrayList<>();
-        IAVLNode node = ((AVLNode) getRoot()).searchNode(x);
+        IAVLNode node = ((AVLNode) getRoot()).searchNode(x); // initializing pointers and empty trees to be filled
         IAVLNode nextCurr = this.getRoot();
         AVLTree leftTree = new AVLTree();
         AVLTree rightTree = new AVLTree();
         AVLTree toJoin = new AVLTree();
 
-        IAVLNode successor = node.Successor();
+        IAVLNode successor = node.Successor(); // finds successor, predecessor, min and max to be set as pointers later
         IAVLNode predecessor = node.Predecessor();
         IAVLNode minNode = min;
         IAVLNode maxNode = max;
 
 
-        if (node.getLeft().isRealNode()) {
+        if (node.getLeft().isRealNode()) { // adds left subtree and right subtree split node to the initialized trees
             leftTree.fillTree(node.getLeft());
         }
         if (node.getRight().isRealNode()) {
@@ -371,14 +368,14 @@ public class AVLTree {
         while (curr != null) {
             nextCurr = curr.getParent();
 
-            if (curr.getRight() == prev) { // node is right child
+            if (curr.getRight() == prev) { // node is a right child
 
                 toJoin.fillTree(curr.getLeft());
                 curr.setRight(new AVLNode());
                 curr.setLeft(new AVLNode());
                 curr.setParent(null);
 
-                leftTree.join(curr, toJoin);
+                leftTree.join(curr, toJoin); // node is a right child. therefore its sibling is joined with leftTree
                 leftTree.fillTree(leftTree.getRoot());
 
             } else { // node is left child
@@ -387,16 +384,16 @@ public class AVLTree {
                 curr.setLeft(new AVLNode());
                 curr.setParent(null);
 
-                rightTree.join(curr, toJoin);
+                rightTree.join(curr, toJoin); // node is a left child. therefore its sibling is joined with rightTree
                 rightTree.fillTree(rightTree.getRoot());
 
             }
-            prev = curr;
+            prev = curr; // go up one level in tree
             curr = nextCurr;
 
         }
 
-        leftTree.min = minNode;
+        leftTree.min = minNode; // after all join operations were completed, the pointers from the original tree are used
         leftTree.max = predecessor;
         rightTree.min = successor;
         rightTree.max = maxNode;
@@ -404,11 +401,11 @@ public class AVLTree {
         return new AVLTree[]{leftTree, rightTree};
     }
 
-    private void fillTree(IAVLNode node) {
+    private void fillTree(IAVLNode node) { // fills tree with root
         this.root = node;
         this.root.setParent(null);
-        this.max = node;
-        this.min = node;
+        this.max = node; // only set for initializing purposes - changed in split function
+        this.min = node; // only set for initializing purposes - changed in split function
     }
 
 
@@ -423,7 +420,7 @@ public class AVLTree {
     public int join(IAVLNode x, AVLTree t) {
         int treeRank = getRoot().getHeight();
         int otherRank = t.getRoot().getHeight();
-        int complexity = Math.abs(this.getRoot().getHeight() - t.getRoot().getHeight()) + 1;
+        int complexity = Math.abs(this.getRoot().getHeight() - t.getRoot().getHeight()) + 1; // computes rank diff to be returned
         if (treeRank < otherRank) {
             if (treeRank == -1) {
                 t.insert(x.getKey(), x.getValue());
